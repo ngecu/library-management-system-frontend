@@ -1,0 +1,25 @@
+/* src/components/LibraryDashboard.css */
+body {
+    background-color: #f8f9fa; /* Light background */
+  }
+  
+  h5 {
+    margin-bottom: 1rem;
+  }
+  
+  .card {
+    transition: transform 0.2s; /* Add smooth transformation */
+  }
+  
+  .card:hover {
+    transform: scale(1.02); /* Slightly scale up on hover */
+  }
+  
+  .navbar {
+    border-bottom: 2px solid #FFB71D; /* Green border for navbar */
+  }
+  
+  .shadow-sm {
+    box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075)!important; /* Enhanced shadow */
+  }
+  
