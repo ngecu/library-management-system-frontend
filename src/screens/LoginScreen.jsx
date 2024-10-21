@@ -53,7 +53,7 @@ const LoginScreen = ({ location, history }) => {
 
   return (
     <>
-      <Container style={{ display: 'flex', justifyContent: 'center', alignItems: 'center',height:"80vh" }}>
+      <Container style={{ display: 'flex', justifyContent: 'center', alignItems: 'center',height:"100vh" }}>
       <Spin spinning={isLoading}>
         <div style={{ boxShadow: 'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px', padding: '20px', width: '800px',background:"#5a5892",borderRadius:"20px" }}>
           <Row>
