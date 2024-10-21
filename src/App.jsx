@@ -8,6 +8,10 @@ import Layout from './screens/Admin/Layout';
 import AllBooks from './screens/Admin/AllBooksScreen';
 import IndexAdminScreen from './screens/Admin/IndexAdminScreen';
 import CheckoutScreen from './screens/CheckOutScreen';
+import AllTransactions from './screens/Admin/AllTransactionScreen';
+import IndexPatronScreen from './screens/Patron/IndexPatronScreen';
+import PatronLayout from './screens/Patron/PatronLayout';
+import AllPatrons from './screens/Admin/AllPatronsScreen';
 
 const App = () => {
 
@@ -18,14 +22,22 @@ const App = () => {
           <Routes>
             <Route path='' element={<LoginScreen />} exact />
             <Route path='/librarian' element={<Layout/>}  >
-            <Route path="" element={<IndexAdminScreen />} />
-
+              <Route path="" element={<IndexAdminScreen />} />
               <Route path="allBooks" element={<AllBooks />} />
               <Route path="checkout" element={<CheckoutScreen />} />
               <Route path="checkin" element={<CheckoutScreen />} />
-              <Route path="transactions" element={<CheckoutScreen />} />
+              <Route path="transactions" element={<AllTransactions />} />
+              <Route path="patrons" element={<AllPatrons />} />
+
+              
+            </Route>
+
+            <Route path='/patron' element={<PatronLayout/>}  >
+              <Route path="" element={<IndexPatronScreen />} />
+              <Route path="allBooks" element={<AllBooks />} />
 
             </Route>
+
           </Routes>
         </Router>
 

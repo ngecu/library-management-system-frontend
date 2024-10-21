@@ -9,9 +9,7 @@ import { Dropdown, Space, Typography } from 'antd';
 import { FaAnglesDown, FaAnglesUp, FaUsers } from 'react-icons/fa6';
 import { AiOutlineTransaction } from 'react-icons/ai';
 
-
-
-const Layout = () => {
+const PatronLayout = () => {
 
   const location = useLocation();
   const { pathname } = location;
@@ -30,16 +28,6 @@ const Layout = () => {
       label: 'Item 3',
     },
   ];
-
-  const handleMenuToggle = (e) => {
-    e.preventDefault();
-    console.log("clicked menu-toggle");
-    // Toggle the wrapper class using JavaScript
-    const wrapper = document.getElementById('wrapper');
-    if (wrapper) {
-      wrapper.classList.toggle('toggled');
-    }
-  };
 
   return (
     <div id="wrapper">
@@ -126,7 +114,7 @@ const Layout = () => {
     <Navbar  style={{background:"#5A5892 !important"}}>
       <Container>
         <Navbar.Brand >
-        <MdMenu style={{cursor:"pointer"}}  onClick={handleMenuToggle} id="menu-toggle" />
+        <MdMenu id="menu-toggle" />
 
         </Navbar.Brand>
         <Navbar.Toggle />
@@ -162,4 +150,4 @@ const Layout = () => {
   );
 };
 
-export default Layout;
+export default PatronLayout;

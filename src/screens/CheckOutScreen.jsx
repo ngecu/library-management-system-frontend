@@ -127,6 +127,7 @@ const formatDate = (date) => {
       form.resetFields();
       setAvailableCopies([]);
       setSelectedBook(null);
+      navigate("/librarian/transactions");
     } catch (error) {
       message.error(error.message || 'Failed to borrow the book');
     }

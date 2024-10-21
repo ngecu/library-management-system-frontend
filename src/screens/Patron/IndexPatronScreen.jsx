@@ -16,7 +16,7 @@ import {
 } from '../../features/booksApi';
 import { useFetchPatronsQuery } from '../../features/userApi';
 
-const IndexAdminScreen = () => {
+const IndexPatronScreen = () => {
 
   const location = useLocation();
   const { pathname } = location;
@@ -220,4 +220,4 @@ const IndexAdminScreen = () => {
   );
 };
 
-export default IndexAdminScreen;
+export default IndexPatronScreen;
