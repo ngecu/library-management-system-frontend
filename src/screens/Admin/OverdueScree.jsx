@@ -6,17 +6,17 @@ import { IoCloudDownloadSharp } from "react-icons/io5";
 import { Drawer, Modal, Spin } from 'antd';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable'; // Ensure AutoTable is imported for PDF
-import { useFetchTransactionsQuery, useBorrowBookMutation, useReturnBookMutation, useRenewBookMutation } from '../../features/transactionApi';
+import { useBorrowBookMutation, useReturnBookMutation, useRenewBookMutation, useFetchOverdueQuery } from '../../features/transactionApi';
 import { notification } from 'antd';
 
-const AllTransactions = () => {
+const OverdueScreen = () => {
   const [showDetailDrawer, setShowDetailDrawer] = useState(false);
   const [showEditDrawer, setShowEditDrawer] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [renewBookId, setRenewBookId] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const { data: transactions = [], isLoading } = useFetchTransactionsQuery();
+  const { data: transactions = [], isLoading } = useFetchOverdueQuery();
   const [borrowBook] = useBorrowBookMutation();
   const [returnBook] = useReturnBookMutation();
   const [renewBook] = useRenewBookMutation();
@@ -171,7 +171,7 @@ const transactionsWithFormattedData = transactions.map(transaction => ({
         <div className="bg-light">
         <div className="row py-2 px-2">
     <div className="col-8">
-      <h2>All Transactions</h2>
+      <h2>All Overdue</h2>
       </div>
         <div className="col-4 d-flex align-items-center justify-content-end">
       <div className="search-bar">
@@ -295,4 +295,4 @@ const transactionsWithFormattedData = transactions.map(transaction => ({
   );
 };
 
-export default AllTransactions;
+export default OverdueScreen;

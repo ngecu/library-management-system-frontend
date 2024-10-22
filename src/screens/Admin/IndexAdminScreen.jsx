@@ -5,7 +5,7 @@ import { MdOutlineKeyboardDoubleArrowDown } from "react-icons/md";
 import { FaAnglesUp } from "react-icons/fa6";
 import { MdAutorenew } from "react-icons/md";
 import { HiDocumentReport } from "react-icons/hi";
-import { FaUsers } from "react-icons/fa";
+import { FaUserPlus, FaUsers } from "react-icons/fa";
 import { BsEmojiAngryFill } from "react-icons/bs";
 import { AiOutlineTransaction } from "react-icons/ai";
 import { 
@@ -15,7 +15,8 @@ import {
   useDeleteBookMutation 
 } from '../../features/booksApi';
 import { useFetchPatronsQuery } from '../../features/userApi';
-
+import { Gauge } from '@ant-design/plots';
+import client from '../../assets/client.png'
 const IndexAdminScreen = () => {
 
   const location = useLocation();
@@ -120,19 +121,36 @@ const IndexAdminScreen = () => {
       <div className="row h-100">
        
 
-       <div class="col-xl-12 col-md-12 mb-4 h-100">
+       <div class="col-xl-6 col-md-6 mb-4 h-100">
          <div class="card h-100">
            <div class="card-body">
              <div class="row align-items-center">
                <div class="col mr-2">
-                 <div class="text-xs text-white font-weight-bold text-uppercase mb-1">RECENT TRANSACTIONS</div>
                  <div class="h5 mb-0 font-weight-bold text-gray-800"></div>
                  <div class="mt-2 mb-0 text-muted text-xs">
                  
                  </div>
                </div>
                <div class="col-auto">
-
+              <img src={client} style={{width:"100%"}} alt="" />
+                
+               </div>
+             </div>
+           </div>
+         </div>
+       </div>
+       <div class="col-xl-6 col-md-6 mb-4 h-100">
+         <div class="card h-100">
+           <div class="card-body">
+             <div class="row align-items-center">
+               <div class="col mr-2">
+                 <div class="h5 mb-0 font-weight-bold text-gray-800"></div>
+                 <div class="mt-2 mb-0 text-muted text-xs">
+                 
+                 </div>
+               </div>
+               <div class="col-auto">
+              <img src={client} style={{width:"100%"}} alt="" />
                 
                </div>
              </div>
@@ -148,6 +166,7 @@ const IndexAdminScreen = () => {
    
 
         <div class="col-xl-6 col-md-6 mb-4">
+        <NavLink to="/librarian/overdue" style={{textDecoration:"none"}}>
           <div class="card h-100">
             <div class="card-body">
               <div class="row align-items-center">
@@ -165,6 +184,7 @@ const IndexAdminScreen = () => {
               </div>
             </div>
           </div>
+          </NavLink>
         </div>
 
         <div class="col-xl-6 col-md-6 mb-4">
@@ -190,6 +210,7 @@ const IndexAdminScreen = () => {
         </div>
 
         <div class="col-xl-6 col-md-6 mb-4">
+        <NavLink to="/librarian/reports" style={{textDecoration:"none"}}>
           <div class="card h-100">
             <div class="card-body">
               <div class="row align-items-center">
@@ -206,6 +227,30 @@ const IndexAdminScreen = () => {
               </div>
             </div>
           </div>
+          </NavLink>
+        </div>
+
+    
+
+        <div class="col-xl-6 col-md-6 mb-4">
+        <NavLink to="/librarian/reports" style={{textDecoration:"none"}}>
+          <div class="card h-100">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col mr-2">
+                  <div class="text-xs text-white font-weight-bold text-uppercase mb-1">Add User</div>
+                  <div class="h5 mb-0 font-weight-bold text-gray-800"></div>
+                  <div class="mt-2 mb-0 text-muted text-xs">
+                  
+                  </div>
+                </div>
+                <div class="col-auto">
+                <FaUserPlus size={64} color="white" />
+                </div>
+              </div>
+            </div>
+          </div>
+          </NavLink>
         </div>
         </div>
       </div>
@@ -221,3 +266,30 @@ const IndexAdminScreen = () => {
 };
 
 export default IndexAdminScreen;
+
+
+
+
+
+const DemoGauge = () => {
+  const config = {
+
+    autoFit: true,
+    data: {
+      target: 159,
+      total: 400,
+      name: 'score',
+      thresholds: [100, 200, 400],
+    },
+    legend: false,
+    scale: {
+      color: {
+        range: ['#F4664A', '#FAAD14', 'green'],
+      },
+    },
+    style: {
+      textContent: (target, total) => `得分：${target}\n占比：${(target / total) * 100}%`,
+    },
+  };
+  return <Gauge {...config} />;
+};

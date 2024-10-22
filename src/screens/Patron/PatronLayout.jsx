@@ -1,152 +1,88 @@
 import React from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
-import { Container, Navbar } from 'react-bootstrap';
+import { Container, Nav, Navbar, NavDropdown } from 'react-bootstrap';
 import { FaHome, FaRegUserCircle } from 'react-icons/fa';
 import { GiBookshelf } from 'react-icons/gi';
 import { MdMenu } from 'react-icons/md';
-import { DownOutlined } from '@ant-design/icons';
-import { Dropdown, Space, Typography } from 'antd';
+import { Dropdown, notification } from 'antd';
 import { FaAnglesDown, FaAnglesUp, FaUsers } from 'react-icons/fa6';
 import { AiOutlineTransaction } from 'react-icons/ai';
+import { BsEmojiAngryFill } from 'react-icons/bs';
+import { HiDocumentReport } from 'react-icons/hi';
+
+const openNotification = (type, message, description) => {
+  notification[type]({
+    message,
+    description,
+    placement: 'topRight',
+    duration: 3,
+  });
+};
 
 const PatronLayout = () => {
-
   const location = useLocation();
   const { pathname } = location;
 
-  const items = [
-    {
-      key: '1',
-      label: 'Item 1',
-    },
-    {
-      key: '2',
-      label: 'Item 2',
-    },
-    {
-      key: '3',
-      label: 'Item 3',
-    },
-  ];
+  const handleLogout = () => {
+    localStorage.removeItem('login');
+    openNotification('success', 'Logout Successful', 'You have been logged out.');
+    navigate("/");
+  };
+
+  const handleMenuToggle = (e) => {
+    e.preventDefault();
+    const wrapper = document.getElementById('wrapper');
+    if (wrapper) {
+      wrapper.classList.toggle('toggled');
+    }
+  };
+
+  const navStyle = (path) => {
+    return pathname === path
+      ? { backgroundColor: 'rgba(246, 189, 48,1)',borderRadius: '20px',color: '#fff' }
+      : {};
+  };
 
   return (
-    <div id="wrapper">
+    <div>
+   
 
-    <div id="sidebar-wrapper">
-        <ul class="sidebar-nav">
-            <li class="sidebar-brand">
-            <NavLink 
-                to="/librarian">
-                    Library Management System
-                </NavLink>
-            </li>
-            <li>
-            <NavLink 
-                to="/librarian" 
-                className={`d-flex align-items-left justify-content-left `}
-                style={{alignItems: "center",paddingLeft: "7%"}}
-                >
-               <FaHome />
-                <span className="ml-2">Dashboard</span>
-                </NavLink>
-
-            </li>
-            <li>
-                <NavLink to="/librarian/allBooks"
-                className={`d-flex align-items-left justify-content-left `}
-                style={{alignItems: "center",paddingLeft: "7%"}}
-                
-                > 
-                <GiBookshelf />
-                <span className="ml-2">Books</span>
-                </NavLink>
-            </li>
-            <li>
-                <NavLink to="/librarian/checkout"
-                className={`d-flex align-items-left justify-content-left `}
-                style={{alignItems: "center",paddingLeft: "7%"}}
-                
-                > 
-                                           <FaAnglesUp />
-
-                <span className="ml-2">Checkout</span>
-                </NavLink>
-            </li>
-            <li>
-            <NavLink to="/librarian/checkin"
-                className={`d-flex align-items-left justify-content-left `}
-                style={{alignItems: "center",paddingLeft: "7%"}}
-                
-                > 
-                                           <FaAnglesDown />
-
-                <span className="ml-2">CheckIn</span>
-                </NavLink>
-            </li>
-            <li>
-            <NavLink to="/librarian/transactions"
-                className={`d-flex align-items-left justify-content-left `}
-                style={{alignItems: "center",paddingLeft: "7%"}}
-                
-                > 
-                                           <AiOutlineTransaction />
-
-                <span className="ml-2">Transactions</span>
-                </NavLink>
-            </li>
-            <li>
-            <NavLink to="/librarian/patrons"
-                className={`d-flex align-items-left justify-content-left `}
-                style={{alignItems: "center",paddingLeft: "7%"}}
-                
-                > 
-                                <FaUsers  />
-
-
-                                         
-
-                <span className="ml-2">Patrons</span>
-                </NavLink>
-            </li>
-        </ul>
-    </div>
-
-    <Navbar  style={{background:"#5A5892 !important"}}>
+   <Navbar collapseOnSelect expand="lg" className="bg-body-tertiary">
       <Container>
-        <Navbar.Brand >
-        <MdMenu id="menu-toggle" />
-
-        </Navbar.Brand>
-        <Navbar.Toggle />
-        <Navbar.Collapse className="justify-content-end">
-          <Navbar.Text>
-          <Dropdown
-    menu={{
-      items,
-      selectable: true,
-      defaultSelectedKeys: ['3'],
-    }}
-  >
-    <Typography.Link>
-      <Space>
-      <FaRegUserCircle />
-      </Space>
-    </Typography.Link>
-  </Dropdown>
-          </Navbar.Text>
+        <Navbar.Brand href="#home">Library Management System</Navbar.Brand>
+        <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+        <Navbar.Collapse id="responsive-navbar-nav">
+          <Nav className="me-auto">
+            <Nav.Link href="#features">Books</Nav.Link>
+            <Nav.Link href="#pricing">OverDue</Nav.Link>
+            <NavDropdown title="Dropdown" id="collapsible-nav-dropdown">
+              <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
+              <NavDropdown.Item href="#action/3.2">
+                Another action
+              </NavDropdown.Item>
+              <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
+              <NavDropdown.Divider />
+              <NavDropdown.Item href="#action/3.4">
+                Separated link
+              </NavDropdown.Item>
+            </NavDropdown>
+          </Nav>
+          <Nav>
+            <Nav.Link href="#deets">More deets</Nav.Link>
+            <Nav.Link eventKey={2} href="#memes">
+              Dank memes
+            </Nav.Link>
+          </Nav>
         </Navbar.Collapse>
       </Container>
     </Navbar>
 
-    <div id="page-content-wrapper">
-       
-        <div class="container-fluid">
-           <Outlet/>
+      <div id="page-content-wrapper">
+        <div className="container">
+          <Outlet />
         </div>
+      </div>
     </div>
-
-
-</div>
   );
 };
 

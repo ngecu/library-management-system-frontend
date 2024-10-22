@@ -8,8 +8,9 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable'; // Ensure AutoTable is imported for PDF
 import { useFetchTransactionsQuery, useBorrowBookMutation, useReturnBookMutation, useRenewBookMutation } from '../../features/transactionApi';
 import { notification } from 'antd';
+import { Gauge } from '@ant-design/plots';
 
-const AllTransactions = () => {
+const ReportScreen = () => {
   const [showDetailDrawer, setShowDetailDrawer] = useState(false);
   const [showEditDrawer, setShowEditDrawer] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
@@ -171,39 +172,98 @@ const transactionsWithFormattedData = transactions.map(transaction => ({
         <div className="bg-light">
         <div className="row py-2 px-2">
     <div className="col-8">
-      <h2>All Transactions</h2>
+      <h2>Reports Page</h2>
       </div>
-        <div className="col-4 d-flex align-items-center justify-content-end">
-      <div className="search-bar">
-        <InputGroup>
-          <Form.Control
-            type="text"
-            placeholder="Search by Transaction ID, User ID, or Type"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <Button variant="primary" onClick={() => setSearchQuery('')}>
-            <FaSearch />
-          </Button>
-        </InputGroup>
-      </div>
-      </div>
-
-      <div className="col-6">
-      <div className="export-buttons">
-        <Button className='metallic-button' onClick={() => generatePDF(transactions)} style={{ marginRight: 8 }}>
-          <FaPrint /> Save PDF
-        </Button>
-        <Button className='metallic-button' onClick={() => generateCSV(transactions)}>
-          <IoCloudDownloadSharp /> Save CSV
-        </Button>
-      </div>
+       
         </div>
 
+     
+<div className="row">
+  <div class="col-xl-6 col-md-12 mb-4 h-100">
+          <div class="card h-100">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col mr-2">
+                  <div class="text-xs text-white font-weight-bold text-uppercase mb-1">BOOKS/BORROW RATIO</div>
+                  <div class="h5 mb-0 font-weight-bold text-gray-800"></div>
+                  <div class="mt-2 mb-0 text-muted text-xs">
+                  
+                  </div>
+                </div>
+                <div class="col-auto">
+                <DemoGauge />
+                  
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      <div style={{ height: 400, width: '100%' }}>
-        <DataGrid rows={filteredTransactions} columns={columns} pageSize={10} />
-      </div>
+
+       <div class="col-xl-6 col-md-12 mb-4 h-100">
+         <div class="card h-100">
+           <div class="card-body">
+             <div class="row align-items-center">
+               <div class="col mr-2">
+                 <div class="text-xs text-white font-weight-bold text-uppercase mb-1">BOOKS/BORROW RATIO</div>
+                 <div class="h5 mb-0 font-weight-bold text-gray-800"></div>
+                 <div class="mt-2 mb-0 text-muted text-xs">
+                 
+                 </div>
+               </div>
+               <div class="col-auto">
+               <DemoGauge />
+                
+               </div>
+             </div>
+           </div>
+         </div>
+       </div>
+
+       <div class="col-xl-6 col-md-12 mb-4 h-100">
+         <div class="card h-100">
+           <div class="card-body">
+             <div class="row align-items-center">
+               <div class="col mr-2">
+                 <div class="text-xs text-white font-weight-bold text-uppercase mb-1">BOOKS/BORROW RATIO</div>
+                 <div class="h5 mb-0 font-weight-bold text-gray-800"></div>
+                 <div class="mt-2 mb-0 text-muted text-xs">
+                 
+                 </div>
+               </div>
+               <div class="col-auto">
+               <DemoGauge />
+                
+               </div>
+             </div>
+           </div>
+         </div>
+       </div>
+
+       <div class="col-xl-6 col-md-12 mb-4 h-100">
+         <div class="card h-100">
+           <div class="card-body">
+             <div class="row align-items-center">
+               <div class="col mr-2">
+                 <div class="text-xs text-white font-weight-bold text-uppercase mb-1">BOOKS/BORROW RATIO</div>
+                 <div class="h5 mb-0 font-weight-bold text-gray-800"></div>
+                 <div class="mt-2 mb-0 text-muted text-xs">
+                 
+                 </div>
+               </div>
+               <div class="col-auto">
+               <DemoGauge />
+                
+               </div>
+             </div>
+           </div>
+         </div>
+       </div>
+       
+</div>
+
+
+       
+  
    
 
   
@@ -295,4 +355,31 @@ const transactionsWithFormattedData = transactions.map(transaction => ({
   );
 };
 
-export default AllTransactions;
+export default ReportScreen;
+
+
+
+
+
+const DemoGauge = () => {
+  const config = {
+
+    autoFit: true,
+    data: {
+      target: 159,
+      total: 400,
+      name: 'score',
+      thresholds: [100, 200, 400],
+    },
+    legend: false,
+    scale: {
+      color: {
+        range: ['#F4664A', '#FAAD14', 'green'],
+      },
+    },
+    style: {
+      textContent: (target, total) => `得分：${target}\n占比：${(target / total) * 100}%`,
+    },
+  };
+  return <Gauge {...config} />;
+};

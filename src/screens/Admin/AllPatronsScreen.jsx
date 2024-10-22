@@ -8,7 +8,7 @@ import { Modal, Spin } from 'antd';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable'; 
 import { notification } from 'antd';
-import { useFetchPatronsQuery } from '../../features/userApi';
+import { useFetchPatronsQuery, useUpdateStatusMutation } from '../../features/userApi';
 
 const AllPatrons = () => {
   const [show, setShow] = useState(false);
@@ -22,7 +22,7 @@ const AllPatrons = () => {
   const [selectedPatron, setSelectedPatron] = useState(null);
   const [deletePatronId, setDeletePatronId] = useState(null);
   const [isAddingPatron, setIsAddingPatron] = useState(false);
-
+  const [updateStatus] = useUpdateStatusMutation(); 
   const { data: patrons = [], isLoading } = useFetchPatronsQuery();
   
   // Mutations
@@ -43,12 +43,34 @@ const AllPatrons = () => {
     });
   };
 
+ // Handle activation/deactivation
+ const handleToggleStatus = async (patron) => {
+  try {
+    const updatedStatus = !patron.isActive;
+    await updateStatus({ id: patron._id, isActive: updatedStatus });
+    openNotification('success', 'Status Updated', `Patron ${updatedStatus ? 'Activated' : 'Deactivated'} successfully`);
+  } catch (error) {
+    openNotification('error', 'Update Failed', 'Failed to update patron status');
+  }
+};
 
 
   const columns = [
     { field: 'name', headerName: 'Name', width: 200 },
     { field: 'email', headerName: 'Email', width: 200 },
-  
+    {
+      field: 'isActive',
+      headerName: 'Status',
+      width: 150,
+      renderCell: (params) => (
+        <Button
+          variant={params.row.isActive ? 'danger' : 'success'}
+          onClick={() => handleToggleStatus(params.row)}
+        >
+          {params.row.isActive ? 'Deactivate' : 'Activate'}
+        </Button>
+      ),
+    },
   ];
 
   const generatePDF = (patrons) => {
@@ -128,7 +150,12 @@ const AllPatrons = () => {
         </div>
       ) : (
         <div className="bg-light">
+           <div className="row py-2 px-2">
+           <div className="col-8">
           <h3>Patrons</h3>
+          </div>
+        <div className="col-4 d-flex align-items-center justify-content-end">
+        <div className="search-bar">
           <InputGroup className="mb-3">
             <Form.Control
               type="text"
@@ -139,17 +166,28 @@ const AllPatrons = () => {
               <FaSearch />
             </Button>
           </InputGroup>
+          </div>
+      </div>
+
+      <div className="col-6">
+      <div className="export-buttons">
           <ButtonGroup>
-            <Button variant="primary" onClick={() => setShow(true)}>
+            <Button style={{ background: '#5A5892' }} onClick={() => setShow(true)}>
               <IoIosAddCircle /> Add New Patron
             </Button>
-            <Button variant="secondary" onClick={() => generatePDF(patrons)}>
+            <Button className='metallic-button' onClick={() => generatePDF(patrons)}>
               <FaPrint /> Print Preview
             </Button>
-            <Button variant="secondary" onClick={() => generateCSV(patrons)}>
+            <Button className='metallic-button' onClick={() => generateCSV(patrons)}>
               <IoCloudDownloadSharp /> Save CSV
             </Button>
           </ButtonGroup>
+          </div>
+        </div>
+
+        </div>
+        <div style={{ height: 400, width: '100%' }}>
+
           <DataGrid
             rows={patrons.map(patron => ({ ...patron, id: patron._id }))}
             columns={columns}
@@ -157,6 +195,7 @@ const AllPatrons = () => {
             rowsPerPageOptions={[5, 10]}
             disableSelectionOnClick
           />
+          </div>
         </div>
       )}
 

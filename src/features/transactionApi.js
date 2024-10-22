@@ -34,6 +34,17 @@ export const transactionApi = createApi({
       providesTags: ['transactions'],
     }),
 
+    fetchOverdue: builder.query({
+      query: () => ({
+        url: `/overdue`,
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
+      providesTags: ['transactions'],
+    }),
+
     // Fetch transactions by user ID
     fetchTransactionsByUser: builder.query({
       query: (userId) => ({
@@ -93,4 +104,6 @@ export const {
   useBorrowBookMutation,
   useReturnBookMutation,
   useRenewBookMutation,
+  useFetchOverdueQuery
+  
 } = transactionApi;

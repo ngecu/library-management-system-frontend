@@ -12,6 +12,9 @@ import AllTransactions from './screens/Admin/AllTransactionScreen';
 import IndexPatronScreen from './screens/Patron/IndexPatronScreen';
 import PatronLayout from './screens/Patron/PatronLayout';
 import AllPatrons from './screens/Admin/AllPatronsScreen';
+import LostPasswordScreen from './screens/LostPasswordScreen';
+import OverdueScreen from './screens/Admin/OverdueScree';
+import ReportScreen from './screens/Admin/ReportScreen';
 
 const App = () => {
 
@@ -20,7 +23,12 @@ const App = () => {
 
 <Router>
           <Routes>
+
+          
+
             <Route path='' element={<LoginScreen />} exact />
+            <Route path='lost-password' element={<LostPasswordScreen />} exact />
+
             <Route path='/librarian' element={<Layout/>}  >
               <Route path="" element={<IndexAdminScreen />} />
               <Route path="allBooks" element={<AllBooks />} />
@@ -28,6 +36,8 @@ const App = () => {
               <Route path="checkin" element={<CheckoutScreen />} />
               <Route path="transactions" element={<AllTransactions />} />
               <Route path="patrons" element={<AllPatrons />} />
+              <Route path="overdue" element={<OverdueScreen />} />
+              <Route path="reports" element={<ReportScreen />} />
 
               
             </Route>
