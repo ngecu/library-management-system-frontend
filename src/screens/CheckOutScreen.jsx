@@ -127,6 +127,7 @@ const formatDate = (date) => {
       form.resetFields();
       setAvailableCopies([]);
       setSelectedBook(null);
+      navigate("/librarian/transactions");
     } catch (error) {
       message.error(error.message || 'Failed to borrow the book');
     }
@@ -295,11 +296,11 @@ const formatDate = (date) => {
             key={item.key}
             title={item.title}
             style={{
-              color: current === index ? '#5a5892' : '#8c8c8c',
+              color: current === index ? '#294A70' : '#8c8c8c',
             }}
             icon={
               <div style={{
-                backgroundColor: current === index ? '#5a5892' : '#8c8c8c',
+                backgroundColor: current === index ? '#294A70' : '#8c8c8c',
                 borderRadius: '50%',
                 width: '24px',
                 height: '24px',

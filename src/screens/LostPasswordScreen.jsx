@@ -2,11 +2,9 @@ import { Form, Input, message } from 'antd';
 
 import React, { useEffect, useState } from 'react';
 import { useDispatch,useSelector } from 'react-redux';
-import { resetPassword } from '../actions/userActions';
-import { Button, Col, Container, Row } from 'react-bootstrap';
-import Message from '../components/Message'
-import Loader from '../components/Loader'
 
+import { Button, Col, Container, Row } from 'react-bootstrap';
+import home from "../assets/home.jpeg"
 
 const LostPasswordScreen = () => {
   const key = 'updatable';
@@ -16,34 +14,31 @@ const LostPasswordScreen = () => {
   const [buttonDisabled, setButtonDisabled] = useState(false);
   const [countdown, setCountdown] = useState(10);
 
-  const userResetPassword = useSelector((state) => state.userResetPassword)
-  const { loading, error, success } = userResetPassword
 
-  useEffect(() => {
-    let timer;
+  // useEffect(() => {
+  //   let timer;
 
-    if (success) {
-      setButtonDisabled(true);
+  //   if (success) {
+  //     setButtonDisabled(true);
 
-      timer = setInterval(() => {
-        setCountdown((prevCount) => prevCount - 1);
-      }, 1000);
+  //     timer = setInterval(() => {
+  //       setCountdown((prevCount) => prevCount - 1);
+  //     }, 1000);
 
-      setTimeout(() => {
-        setButtonDisabled(false);
-        setCountdown(10);
-        clearInterval(timer);
-      }, 10000);
+  //     setTimeout(() => {
+  //       setButtonDisabled(false);
+  //       setCountdown(10);
+  //       clearInterval(timer);
+  //     }, 10000);
 
-      return () => clearInterval(timer); // Clear the interval on component unmount
-    }
-  }, [success]);
+  //     return () => clearInterval(timer); // Clear the interval on component unmount
+  //   }
+  // }, []);
 
 
   const submitPasswordHandler = async (values) => {
     try {
       const { Email } = values;
-      await dispatch(resetPassword(Email));
    
     } catch (error) {
       message.error(
@@ -58,16 +53,16 @@ const LostPasswordScreen = () => {
   
 
   return (
-    <Container style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-            <div style={{ boxShadow: 'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px', padding: '20px', width: '800px' }}>
+    <Container style={{ display: 'flex', justifyContent: 'center', alignItems: 'center',height:"100vh" }}>
+            <div style={{ boxShadow: 'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px', padding: '20px', width: '800px',background:"#294A70",borderRadius:"20px" }}>
             <Row>
         <Col md={12} className='text-center'>
-          <h1>School Management System</h1>
+        <h1 style={{color:"white"}}>Library Management System</h1>
          
         </Col>
 
         <Col md={6}>
-        <p>
+        <p className="text-light">
             Lost your password? Please enter your username or email address. You will receive a
             link to create a new password via email.
           </p>
@@ -75,9 +70,7 @@ const LostPasswordScreen = () => {
         <div className="woocommerce">
           <div className="woocommerce-notices-wrapper"></div>
          
-          {error && <Message variant='danger'>{error}</Message>}
-          {success && <Message variant='success'>{success.message}</Message>}
-          {loading && <Loader />}
+        
 
 
           {buttonDisabled && (
@@ -129,6 +122,7 @@ const LostPasswordScreen = () => {
               type="primary"
               htmlType="submit"
               disabled={buttonDisabled}
+              style={{border:"solid #535266",background:"#FFB71D",color:"#535266",borderRadius:"40px"}}
             >
               Reset Password
             </Button>
@@ -138,10 +132,9 @@ const LostPasswordScreen = () => {
       </div>
         </Col>
 
-        <Col md={6}>
-          <img src="https://www.edoptim.com/assets/school-management-software-system-edoptim-b5ef1e0f510b713c561367aa9b938021810178a1d8f2d67f56a200c953a0d86c.jpg
-" alt="" className='w-100' />
-          </Col>
+        <Col md={6} style={{display: "flex",justifyContent: "center"}}>
+              <img style={{position: "relative", right: "4%",borderRadius:"40px"}} src={home} alt="" className='w-100' />
+            </Col>
         
         </Row>
      

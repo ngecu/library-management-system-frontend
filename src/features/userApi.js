@@ -68,6 +68,17 @@ export const userApi = createApi({
       providesTags: ['users'],
     }),
 
+    fetchPatrons: builder.query({
+      query: () => ({
+        url: '/patrons',
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
+      providesTags: ['users'],
+    }),
+
     // Get a user by ID (admin)
     fetchUserById: builder.query({
       query: (userId) => ({
@@ -105,13 +116,18 @@ export const userApi = createApi({
       invalidatesTags: ['users'],
     }),
 
-    // Fetch police officers (if needed, adjust the URL as per your API)
-    fetchOfficers: builder.query({
-      query: () => '/police',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    updateStatus: builder.mutation({
+      query: ({ id, ...values }) => ({
+        url: `/status/${id}`,
+        method: 'PUT',
+        body: values,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
+      invalidatesTags: ['users'],
     }),
+
   }),
 });
 
@@ -120,10 +136,12 @@ export const {
   useRegisterMutation,
   useLoginMutation,
   useFetchUserQuery,
+  useFetchPatronsQuery,
   useUpdateUserProfileMutation,
   useFetchUsersQuery,
   useFetchUserByIdQuery,
   useUpdateUserMutation,
+  useUpdateStatusMutation,
   useDeleteUserMutation,
   useFetchOfficersQuery,
 } = userApi;

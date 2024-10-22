@@ -387,11 +387,11 @@ const confirmDelete = (bookId) => {
   <div className="col-6">
             <ButtonGroup aria-label="Basic example">
             {isAdmin && (
-        <Button style={{ background: '#294A70' }} onClick={handleShow}>
+        <Button style={{ background: '#5A5892' }} onClick={handleShow}>
           <IoIosAddCircle color="white" /> Add New
         </Button>
       )}
-            <Button className='metallic-button' onClick={() => generatePDF(filteredBooks)}> <FaPrint /> Save PDF</Button>
+            <Button className='metallic-button' onClick={() => generatePDF(filteredBooks)}> <FaPrint /> Print Preview</Button>
       <Button className='metallic-button' onClick={() => generateCSV(filteredBooks)}>  <IoCloudDownloadSharp /> Save CSV</Button>
 
     </ButtonGroup>

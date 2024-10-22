@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Button, Row, Col, Container } from 'react-bootstrap';
 import { useLoginMutation } from '../features/userApi'; // Adjust the import path as necessary
 import { Checkbox, Form, Input, Spin } from 'antd';
@@ -31,7 +31,6 @@ const LoginScreen = ({ location, history }) => {
     try {
       const result = await login({ email, password }).unwrap(); // Unwrap the result to get the response
       localStorage.setItem('login', JSON.stringify(result));
-      console.log("Login successful:", result);
 
 
     // Show success notification
@@ -55,7 +54,7 @@ const LoginScreen = ({ location, history }) => {
     <>
       <Container style={{ display: 'flex', justifyContent: 'center', alignItems: 'center',height:"100vh" }}>
       <Spin spinning={isLoading}>
-        <div style={{ boxShadow: 'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px', padding: '20px', width: '800px',background:"#5a5892",borderRadius:"20px" }}>
+        <div style={{ boxShadow: 'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px', padding: '20px', width: '800px',background:"#294A70",borderRadius:"20px" }}>
           <Row>
             <Col md={12} className='text-center'>
               <h1 style={{color:"white"}}>Library Management System</h1>
@@ -111,8 +110,10 @@ const LoginScreen = ({ location, history }) => {
                       </Button>
                     </Form.Item>
                   </Col>
-                  <Col md={12} className='mt-2' style={{color:"white"}}>
-                  Lost Your Password?
+                  <Col md={12} className='mt-2' style={{color:"white",textAlign:"center"}}>
+                  <NavLink to="lost-password" style={{color:"white",textDecoration:"none"}}>
+                      Lost Your Password?
+                  </NavLink>
                   </Col>
                 </Row>
               </Form>
@@ -122,8 +123,7 @@ const LoginScreen = ({ location, history }) => {
             <Col md={6} style={{display: "flex",justifyContent: "center"}}>
               <img style={{position: "relative", right: "4%",borderRadius:"40px"}} src={home} alt="" className='w-100' />
             </Col>
-            <Col md={12}>
-            </Col>
+          
           </Row>
         </div>
         </Spin>
