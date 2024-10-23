@@ -1,2 +1,2 @@
 export const MODE = "development"
-export const host = "http://localhost:5000/api"
+export const host = "https://library-management-system-nb9l.onrender.com/api"
