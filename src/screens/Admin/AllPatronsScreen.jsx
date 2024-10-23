@@ -172,9 +172,7 @@ const AllPatrons = () => {
       <div className="col-6">
       <div className="export-buttons">
           <ButtonGroup>
-            <Button style={{ background: '#5A5892' }} onClick={() => setShow(true)}>
-              <IoIosAddCircle /> Add New Patron
-            </Button>
+           
             <Button className='metallic-button' onClick={() => generatePDF(patrons)}>
               <FaPrint /> Print Preview
             </Button>

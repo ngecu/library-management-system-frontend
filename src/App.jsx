@@ -7,7 +7,7 @@ import LoginScreen from './screens/LoginScreen'
 import Layout from './screens/Admin/Layout';
 import AllBooks from './screens/Admin/AllBooksScreen';
 import IndexAdminScreen from './screens/Admin/IndexAdminScreen';
-import CheckoutScreen from './screens/CheckOutScreen';
+import CheckoutScreen from './screens/Admin/CheckOutScreen';
 import AllTransactions from './screens/Admin/AllTransactionScreen';
 import IndexPatronScreen from './screens/Patron/IndexPatronScreen';
 import PatronLayout from './screens/Patron/PatronLayout';
@@ -15,6 +15,11 @@ import AllPatrons from './screens/Admin/AllPatronsScreen';
 import LostPasswordScreen from './screens/LostPasswordScreen';
 import OverdueScreen from './screens/Admin/OverdueScree';
 import ReportScreen from './screens/Admin/ReportScreen';
+import NewPasswordScreen from './screens/NewPasswordScreen';
+import CheckInScreen from './screens/Admin/CheckInScreen';
+import PatronTransactions from './screens/Patron/PatronTransactionScreen';
+import PatronOverdueScreen from './screens/Patron/PatronOverdueScree';
+import Profile from './screens/Admin/Profile';
 
 const App = () => {
 
@@ -27,17 +32,19 @@ const App = () => {
           
 
             <Route path='' element={<LoginScreen />} exact />
-            <Route path='lost-password' element={<LostPasswordScreen />} exact />
+            <Route path='lost-password' element={<LostPasswordScreen />}  />
+            <Route path='new-password/:id/:token' element={<NewPasswordScreen />}  />
 
             <Route path='/librarian' element={<Layout/>}  >
               <Route path="" element={<IndexAdminScreen />} />
               <Route path="allBooks" element={<AllBooks />} />
               <Route path="checkout" element={<CheckoutScreen />} />
-              <Route path="checkin" element={<CheckoutScreen />} />
+              <Route path="checkin" element={<CheckInScreen />} />
               <Route path="transactions" element={<AllTransactions />} />
               <Route path="patrons" element={<AllPatrons />} />
               <Route path="overdue" element={<OverdueScreen />} />
               <Route path="reports" element={<ReportScreen />} />
+              <Route path="profile" element={<Profile />} />
 
               
             </Route>
@@ -45,6 +52,9 @@ const App = () => {
             <Route path='/patron' element={<PatronLayout/>}  >
               <Route path="" element={<IndexPatronScreen />} />
               <Route path="allBooks" element={<AllBooks />} />
+              <Route path="transactions" element={<PatronTransactions />} />
+              <Route path="overdue" element={<PatronOverdueScreen />} />
+              <Route path="profile" element={<Profile />} />
 
             </Route>
 
