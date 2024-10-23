@@ -1,30 +1,19 @@
 import { Form,Input } from 'antd';
 import React, { useState, useEffect } from 'react'
 import {  Button, Container,Row,Col } from 'react-bootstrap';
-import { changePassword } from '../actions/userActions';
 import { useDispatch,useSelector } from 'react-redux';
-import Message from '../components/Message'
-import Loader from '../components/Loader'
 import { useParams } from 'react-router-dom';
+import home from "../assets/home.jpeg";
 
 const NewPasswordScreen = () => {
   const { id } = useParams();
   const { token } = useParams();
 
-
-  
   const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
     const [message, setMessage] = useState(null)
-
-    const userChangePassword = useSelector((state) => state.userChangePassword)
-    const { loading, error, success } = userChangePassword
-
     
     const dispatch = useDispatch()
-
-    const userLogin = useSelector((state) => state.userLogin)
-    const { userInfo } = userLogin
 
 
   const submitPasswordHandler = (values) => {
@@ -35,10 +24,8 @@ const NewPasswordScreen = () => {
       setMessage('Passwords do not match')
     }
     else{
-    dispatch(changePassword(id,token,password))
 
     }
-    // dispatch(resetPassword(Email));
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -47,11 +34,11 @@ const NewPasswordScreen = () => {
 
   return (
     <Container style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-    <div style={{ boxShadow: 'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px', padding: '20px', width: '800px' }}>
+    <div style={{ boxShadow: 'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px', padding: '20px',borderRadius: "20px", width: '800px',  background: "#294A70" }} className='card'>
 
     <Row>
         <Col md={12} className='text-center'>
-          <h1>School Management System</h1>
+        <h1 style={{ color: "white" }}>Library Management System</h1>
          
         </Col>
 
@@ -59,13 +46,7 @@ const NewPasswordScreen = () => {
 
     <div className="entry-content my-4">
       <div className="woocommerce">
-        <div className="woocommerce-notices-wrapper"></div>
-
-        <p>Enter a new password below</p>
-        {message && <Message variant='danger'>{message}</Message>}
-        {error && <Message variant='danger'>{error}</Message>}
-          {success && <Message variant='success'>{success.message}</Message>}
-          {loading && <Loader />}
+        <div className="woocommerce-notices-wrapper"></div>    
 
         <Form
             initialValues={{ remember: true }}
@@ -121,7 +102,12 @@ const NewPasswordScreen = () => {
         span: 32,
       }}
     >
-      <Button variant='primary' type="submit" className='w-100' htmlType="submit">
+      <Button variant='primary' type="submit" className='w-100' htmlType="submit"    style={{
+                        border: "solid #535266",
+                        background: "#FFB71D",
+                        color: "#535266",
+                        borderRadius: "40px",
+                      }}>
         Reset Password
       </Button>
     </Form.Item>
@@ -131,8 +117,12 @@ const NewPasswordScreen = () => {
     </Col>
 
     <Col md={6}>
-          <img src="https://www.edoptim.com/assets/school-management-software-system-edoptim-b5ef1e0f510b713c561367aa9b938021810178a1d8f2d67f56a200c953a0d86c.jpg
-" alt="" className='w-100' />
+    <img
+              style={{ position: "relative", right: "4%", borderRadius: "40px" }}
+              src={home}
+              alt=""
+              className="w-100"
+            />
           </Col>
     </Row>
     </div>

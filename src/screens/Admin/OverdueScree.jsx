@@ -178,7 +178,7 @@ const transactionsWithFormattedData = transactions.map(transaction => ({
         <InputGroup>
           <Form.Control
             type="text"
-            placeholder="Search by Transaction ID, User ID, or Type"
+            placeholder="Search .."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />

@@ -1,14 +1,8 @@
 import React from 'react';
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
-import { Container, Nav, Navbar, NavDropdown } from 'react-bootstrap';
+import { NavLink, Outlet, useLocation, useNavigate,Link } from 'react-router-dom';
+import { Button, Container, Nav, Navbar, NavDropdown } from 'react-bootstrap';
 import { FaHome, FaRegUserCircle } from 'react-icons/fa';
-import { GiBookshelf } from 'react-icons/gi';
-import { MdMenu } from 'react-icons/md';
 import { Dropdown, notification } from 'antd';
-import { FaAnglesDown, FaAnglesUp, FaUsers } from 'react-icons/fa6';
-import { AiOutlineTransaction } from 'react-icons/ai';
-import { BsEmojiAngryFill } from 'react-icons/bs';
-import { HiDocumentReport } from 'react-icons/hi';
 
 const openNotification = (type, message, description) => {
   notification[type]({
@@ -22,7 +16,8 @@ const openNotification = (type, message, description) => {
 const PatronLayout = () => {
   const location = useLocation();
   const { pathname } = location;
-
+  const userDetails = JSON.parse(localStorage.getItem('login'))
+  const navigate = useNavigate()
   const handleLogout = () => {
     localStorage.removeItem('login');
     openNotification('success', 'Logout Successful', 'You have been logged out.');
@@ -46,32 +41,32 @@ const PatronLayout = () => {
   return (
     <div>
    
-
    <Navbar collapseOnSelect expand="lg" className="bg-body-tertiary">
       <Container>
-        <Navbar.Brand href="#home">Library Management System</Navbar.Brand>
+        <Navbar.Brand as={Link} to="/patron">Library Management System</Navbar.Brand>
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link href="#features">Books</Nav.Link>
-            <Nav.Link href="#pricing">OverDue</Nav.Link>
-            <NavDropdown title="Dropdown" id="collapsible-nav-dropdown">
-              <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.2">
-                Another action
-              </NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
-              <NavDropdown.Divider />
-              <NavDropdown.Item href="#action/3.4">
-                Separated link
-              </NavDropdown.Item>
-            </NavDropdown>
+            <Nav.Link as={NavLink} to="/patron/allbooks">Books</Nav.Link>
+            <Nav.Link as={NavLink} to="/patron/overdue">Overdue</Nav.Link>
           </Nav>
           <Nav>
-            <Nav.Link href="#deets">More deets</Nav.Link>
-            <Nav.Link eventKey={2} href="#memes">
-              Dank memes
-            </Nav.Link>
+            <Navbar.Text>
+              <Dropdown
+                menu={{
+                  items: [
+                    { key: '1', label: <NavLink to='/patron/profile'>Profile</NavLink> },
+                    { key: '2', label: <a onClick={handleLogout}>Logout</a> },
+                  ],
+                  selectable: true,
+                }}
+              >
+                <div className="d-flex align-items-center">
+                  <span className="me-2">{userDetails.name}</span>
+                  <FaRegUserCircle />
+                </div>
+              </Dropdown>
+            </Navbar.Text>
           </Nav>
         </Navbar.Collapse>
       </Container>

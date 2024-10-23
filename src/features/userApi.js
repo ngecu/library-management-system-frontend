@@ -4,7 +4,7 @@ import { host } from '../../environment';
 const user = JSON.parse(localStorage.getItem("login"));
 const token = user?.token;
 const base_url = `${host}/users`;
-console.log("tokenn ",token);
+console.log("tokenn ", token);
 
 export const userApi = createApi({
   reducerPath: 'userApi',
@@ -17,6 +17,19 @@ export const userApi = createApi({
         url: '',
         method: 'POST',
         body: newUser,
+      }),
+      invalidatesTags: ['users'],
+    }),
+
+     // Add the new createUser mutation
+     createUser: builder.mutation({
+      query: (userData) => ({
+        url: '/create',
+        method: 'POST',
+        body: userData,
+        headers: {
+          Authorization: `Bearer ${token}`, // Include the token if necessary
+        },
       }),
       invalidatesTags: ['users'],
     }),
@@ -116,6 +129,7 @@ export const userApi = createApi({
       invalidatesTags: ['users'],
     }),
 
+    // Update user status (admin)
     updateStatus: builder.mutation({
       query: ({ id, ...values }) => ({
         url: `/status/${id}`,
@@ -128,12 +142,30 @@ export const userApi = createApi({
       invalidatesTags: ['users'],
     }),
 
+    // Request password reset (POST)
+    requestPasswordReset: builder.mutation({
+      query: ({email}) => ({
+        url: '/reset-password',
+        method: 'POST',
+        body: { email },
+      }),
+    }),
+
+    // Reset password with token (PUT)
+    resetPassword: builder.mutation({
+      query: ({  email }) => ({
+        url: `/reset-password`,
+        method: 'PUT',
+        body: { email },
+      }),
+    }),
   }),
 });
 
 // Export hooks for using the queries and mutations in components
 export const {
   useRegisterMutation,
+  useCreateUserMutation,
   useLoginMutation,
   useFetchUserQuery,
   useFetchPatronsQuery,
@@ -143,5 +175,6 @@ export const {
   useUpdateUserMutation,
   useUpdateStatusMutation,
   useDeleteUserMutation,
-  useFetchOfficersQuery,
+  useRequestPasswordResetMutation,
+  useResetPasswordMutation,
 } = userApi;

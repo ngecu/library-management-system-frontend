@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, message, Select, Spin, Steps } from 'antd';
-import { useBorrowBookMutation, useFetchTransactionsByUserQuery } from '../features/transactionApi';
-import { useFetchBookCopiesQuery, useFetchBooksQuery } from '../features/booksApi';
-import { useFetchUsersQuery } from '../features/userApi';
+import { useFetchUsersQuery } from '../../features/userApi';
 import useScanDetection from "use-scan-detection";
 import { Card, Col, Row } from 'react-bootstrap';
 import { Html5QrcodeScanner } from "html5-qrcode";
-import book from '../assets/book.png'
+import book from '../../assets/book.png'
+import { useFetchTransactionsByUserQuery, useReturnBookMutation } from '../../features/transactionApi';
+import { useFetchBookCopiesQuery } from '../../features/booksApi';
+import Barcode from 'react-barcode';
+import { useNavigate } from 'react-router-dom';
 const { Option } = Select;
 
-const CheckoutScreen = () => {
-  const [borrowBook, { isLoading }] = useBorrowBookMutation();
+const CheckInScreen = () => {
+  const [returnBook, { isLoading }] = useReturnBookMutation();
   const [form] = Form.useForm();
+  const navigate = useNavigate()
 
   const { data: books, isLoading: booksLoading } = useFetchBookCopiesQuery();
   const { data: users, isLoading: usersLoading } = useFetchUsersQuery();
@@ -20,6 +23,7 @@ const CheckoutScreen = () => {
   const [selectedBook, setSelectedBook] = useState(null);
   const [code, setCode] = useState('');
   const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
 
   const [current, setCurrent] = useState(0);
   const { Step } = Steps;
@@ -64,7 +68,7 @@ const CheckoutScreen = () => {
     setSelectedBook(selected);
 
     if (selected) {
-      setAvailableCopies(selected.copies.filter(copy => copy.isAvailable));
+      setAvailableCopies(selected.copies.filter(copy => !copy.isAvailable));
     }
   };
 
@@ -89,15 +93,31 @@ const formatDate = (date) => {
     console.log(decodedText);
     setCode(decodedText);
   
-    const selectedCopy = books.find(copy => copy._id === decodedText && copy.isAvailable);
+    // Find the selected book copy based on the scanned code
+    const selectedCopy = books.find(
+      (copy) => copy._id === decodedText && !copy.isAvailable
+    );
+  
     if (selectedCopy) {
-      console.log("selectedCopy ",selectedCopy);
-      
       setSelectedBook(selectedCopy);
+  
+      // Find the transaction for this user and book copy where the book is not yet returned
+      const transaction = userTransactions.find(
+        (t) =>
+          t.bookCopy._id === selectedCopy._id &&
+          !t.isReturned
+      );
+  
+      if (transaction) {
+        setSelectedTransaction(transaction);
+      } else {
+        message.error("No active transaction found for this book and user.");
+      }
     } else {
       message.error("Invalid or unavailable book copy.");
     }
   };
+  
   
 
   const onScanFailure = (error) => {
@@ -106,32 +126,38 @@ const formatDate = (date) => {
 
   const hasNextButton = () => {
     if (current === 0) {
-      if (!selectedUser) return false;
-      const fineAmountExceeded = userTransactions?.some(transaction => transaction.fineAmount > 0);
-      const hasNoTransactions = !userTransactions?.length;
-
-      return hasNoTransactions || fineAmountExceeded;
-    } else if (current === 1) {
-      if (!code || !books.some(copy => copy._id === code && copy.isAvailable)) return false;
+      if (!selectedUser || !userTransactions) return false;
+  
+      const hasActiveTransaction = userTransactions.some(transaction => !transaction.returned);
+      
+      return hasActiveTransaction;
+    }
+     else if (current === 1) {
+      if (!code || !books.some(copy => copy._id === code && !copy.isAvailable)) return false;
     }
 
     return true;
   };
 
-  const onFinish = async (values) => {
-    const { bookCopyId, userId } = values;
-
+  const onFinish = async () => {
+    if (!selectedTransaction) {
+      message.error("No transaction selected.");
+      return;
+    }
+  
     try {
-      const result = await borrowBook({ bookCopyId, userId }).unwrap();
+      const result = await returnBook(selectedTransaction._id).unwrap();
       message.success(result.message);
       form.resetFields();
       setAvailableCopies([]);
       setSelectedBook(null);
+      setSelectedTransaction(null);
       navigate("/librarian/transactions");
     } catch (error) {
-      message.error(error.message || 'Failed to borrow the book');
+      message.error(error.message || "Failed to return the book");
     }
   };
+  
 
   const stepContents = [
     <div>
@@ -188,20 +214,26 @@ const formatDate = (date) => {
 </section>
 
 </Col>
-              <Col md={6} style={{ boxShadow: 'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px',borderRadius:"20px" }}>
-                <h3>Transaction History</h3>
-                {userTransactions?.length ? (
-                  <ul>
-                    {userTransactions.map(transaction => (
-                      <li key={transaction._id}>
-                        <strong>Book:</strong> {transaction.bookTitle} | <strong>Date:</strong> {new Date(transaction.borrowedAt).toLocaleDateString()} | <strong>Fine Amount:</strong> {transaction.fineAmount}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p>No transaction history for this user.</p>
-                )}
-              </Col>
+<Col md={6} style={{ boxShadow: 'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px',borderRadius:"20px" }}>
+          <h3>Transaction History</h3>
+          {userTransactions?.length ? (
+            <ul>
+              {userTransactions.map(transaction => (
+                <li key={transaction._id}>
+                  <strong>Book:</strong> {transaction.bookTitle} | <strong>Date:</strong> {new Date(transaction.borrowedAt).toLocaleDateString()} | <strong>Fine Amount:</strong> {transaction.fineAmount}
+                  {!transaction.returned && <span style={{ color: 'red' }}> (Not Returned)</span>}
+                  {transaction.fineAmount > 0 && (
+                    <Button type="danger" onClick={() => handleMpesaPayment(transaction.fineAmount)}>
+                      Pay with Mpesa
+                    </Button>
+                  )}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No transaction history for this user.</p>
+          )}
+        </Col>
             </Row>
           )}
         </div>
@@ -209,8 +241,9 @@ const formatDate = (date) => {
     </div>,
 
     <div>
+      <Barcode value="67169b244d1df8fd1967670e" />
       <div id="reader" width="600px"></div>
-      {code && !books.some(copy => copy._id === code && copy.isAvailable) && (
+      {code && !books.some(copy => copy._id === code && !copy.isAvailable) && (
         <p style={{ color: 'red' }}>Invalid barcode. Please try again.</p>
       )}
     </div>,
@@ -329,7 +362,7 @@ const formatDate = (date) => {
             type="primary"
             onClick={() => onFinish({ bookCopyId: selectedBook._id, userId: selectedUser })}
           >
-            Check Out
+            Check In
           </Button>
         )}
 
@@ -347,4 +380,4 @@ const formatDate = (date) => {
   );
 };
 
-export default CheckoutScreen;
+export default CheckInScreen;

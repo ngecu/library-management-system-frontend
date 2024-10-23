@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { GiBookshelf } from "react-icons/gi";
 import { MdOutlineKeyboardDoubleArrowDown } from "react-icons/md";
@@ -14,15 +14,56 @@ import {
   useUpdateBookMutation, 
   useDeleteBookMutation 
 } from '../../features/booksApi';
-import { useFetchPatronsQuery } from '../../features/userApi';
+import { useFetchPatronsQuery, useRegisterMutation } from '../../features/userApi';
 import { Gauge } from '@ant-design/plots';
 import client from '../../assets/client.png'
+import { Modal, Form, Input, Select, Checkbox, Button } from 'antd';
 const IndexAdminScreen = () => {
 
   const location = useLocation();
   const { pathname } = location;
   const { data: books = [], isLoading } = useFetchBooksQuery();
   const { data: patrons = [] } = useFetchPatronsQuery();
+
+  const [visible, setVisible] = useState(false);
+  const [form] = Form.useForm();
+
+  const [register, { isLoading:isRegistering, isError, isSuccess }] = useRegisterMutation();
+
+  const handleOk = async () => {
+    try {
+      const values = await form.validateFields();
+      console.log('Form Values:', values);
+
+      // Call the register mutation with the form values
+      const response = await register(values).unwrap();
+
+      // Handle success
+      console.log('User registered successfully:', response);
+      // You can perform further actions here, such as redirecting or showing a success message
+      handleCancel(); // Call to close the modal or form
+    } catch (errorInfo) {
+      console.log('Validation Failed:', errorInfo);
+
+      // Handle mutation error
+      if (isError) {
+        console.error('Registration failed:', errorInfo);
+        // You might want to show an error message to the user
+      }
+    }
+  };
+
+  const showModal = () => {
+    setVisible(true);
+  };
+
+  const handleCancel = () => {
+    setVisible(false);
+    form.resetFields();
+  };
+
+
+  const userDetails = JSON.parse(localStorage.getItem('login'))
 
 
   return (
@@ -232,8 +273,7 @@ const IndexAdminScreen = () => {
 
     
 
-        <div class="col-xl-6 col-md-6 mb-4">
-        <NavLink to="/librarian/reports" style={{textDecoration:"none"}}>
+        <div class="col-xl-6 col-md-6 mb-4" onClick={userDetails.isAdmin && showModal}>
           <div class="card h-100">
             <div class="card-body">
               <div class="row align-items-center">
@@ -250,7 +290,7 @@ const IndexAdminScreen = () => {
               </div>
             </div>
           </div>
-          </NavLink>
+       
         </div>
         </div>
       </div>
@@ -260,6 +300,68 @@ const IndexAdminScreen = () => {
     </div>
 
     
+
+    <Modal
+  title="Add User"
+  visible={visible}
+  onOk={handleOk}
+  onCancel={handleCancel}
+  okText="Submit"
+  cancelText="Cancel"
+  style={{background:"blue !important"}}
+>
+  <Form form={form} layout="vertical" className="custom-form-label"   style={{background:"blue !important"}}
+  >
+    <Form.Item
+      label="Name"
+      name="name"
+      rules={[{ required: true, message: 'Please input the user name!' }]}
+    >
+      <Input placeholder="Enter name" />
+    </Form.Item>
+
+    <Form.Item
+      label="Email"
+      name="email"
+      rules={[{ required: true, message: 'Please input the user email!' }]}
+    >
+      <Input placeholder="Enter email" />
+    </Form.Item>
+
+    <Form.Item
+      label="Role"
+      name="role"
+      rules={[{ required: true, message: 'Please select the role!' }]}
+    >
+      <Select placeholder="Select a role">
+        <Select.Option value="patron">Patron</Select.Option>
+        <Select.Option value="librarian">Librarian</Select.Option>
+      </Select>
+    </Form.Item>
+
+    <Form.Item
+      label="Password"
+      name="password"
+      rules={[{ required: true, message: 'Please input the password!' }]}
+    >
+      <Input.Password placeholder="Enter password" />
+    </Form.Item>
+
+    <Form.Item name="isAdmin" valuePropName="checked">
+      <Checkbox>Is Admin</Checkbox>
+    </Form.Item>
+
+    <Form.Item name="isActive" valuePropName="checked">
+      <Checkbox>Is Active</Checkbox>
+    </Form.Item>
+
+    <Form.Item label="Student ID" name="studentID">
+      <Input placeholder="Enter Student ID (optional)" />
+    </Form.Item>
+  </Form>
+</Modal>
+
+
  
     </div>
   );

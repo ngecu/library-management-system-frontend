@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Container, Navbar } from 'react-bootstrap';
 import { FaHome, FaRegUserCircle } from 'react-icons/fa';
 import { GiBookshelf } from 'react-icons/gi';
@@ -22,7 +22,7 @@ const openNotification = (type, message, description) => {
 const Layout = () => {
   const location = useLocation();
   const { pathname } = location;
-
+  const navigate = useNavigate()
   const handleLogout = () => {
     localStorage.removeItem('login');
     openNotification('success', 'Logout Successful', 'You have been logged out.');
@@ -42,6 +42,7 @@ const Layout = () => {
       ? { backgroundColor: 'rgba(246, 189, 48,1)',borderRadius: '20px',color: '#fff' }
       : {};
   };
+  const userDetails = JSON.parse(localStorage.getItem('login'))
 
   return (
     <div id="wrapper">
@@ -143,17 +144,20 @@ const Layout = () => {
           <Navbar.Toggle />
           <Navbar.Collapse className="justify-content-end">
             <Navbar.Text>
-              <Dropdown
-                menu={{
-                  items: [
-                    { key: '1', label: <NavLink to='/librarian/profile'>Profile</NavLink> },
-                    { key: '2', label: <a onClick={handleLogout}>Logout</a> }
-                  ],
-                  selectable: true
-                }}
-              >
-                <FaRegUserCircle />
-              </Dropdown>
+            <Dropdown
+    menu={{
+      items: [
+        { key: '1', label: <NavLink to='/librarian/profile'>Profile</NavLink> },
+        { key: '2', label: <a onClick={handleLogout}>Logout</a> },
+      ],
+      selectable: true,
+    }}
+  >
+    <div className="d-flex align-items-center">
+      <span className="me-2">{userDetails.name}</span>
+      <FaRegUserCircle />
+    </div>
+  </Dropdown>
             </Navbar.Text>
           </Navbar.Collapse>
         </Container>

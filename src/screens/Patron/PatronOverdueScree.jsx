@@ -6,17 +6,17 @@ import { IoCloudDownloadSharp } from "react-icons/io5";
 import { Drawer, Modal, Spin } from 'antd';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable'; // Ensure AutoTable is imported for PDF
-import { useFetchTransactionsQuery, useBorrowBookMutation, useReturnBookMutation, useRenewBookMutation } from '../../features/transactionApi';
+import { useBorrowBookMutation, useReturnBookMutation, useRenewBookMutation, useFetchOverdueQuery } from '../../features/transactionApi';
 import { notification } from 'antd';
 
-const AllTransactions = () => {
+const PatronOverdueScreen = () => {
   const [showDetailDrawer, setShowDetailDrawer] = useState(false);
   const [showEditDrawer, setShowEditDrawer] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [renewBookId, setRenewBookId] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const { data: transactions = [], isLoading } = useFetchTransactionsQuery();
+  const { data: transactions = [], isLoading } = useFetchOverdueQuery();
   const [borrowBook] = useBorrowBookMutation();
   const [returnBook] = useReturnBookMutation();
   const [renewBook] = useRenewBookMutation();
@@ -32,44 +32,14 @@ const AllTransactions = () => {
 
   
 // Prepare the data for DataGrid
-function formatReadableDate(isoDate) {
-  const date = new Date(isoDate);
-
-  const months = [
-      'January', 'February', 'March', 'April', 'May', 'June', 
-      'July', 'August', 'September', 'October', 'November', 'December'
-  ];
-
-  const day = date.getDate();
-  const month = months[date.getMonth()];
-  const year = date.getFullYear();
-
-  const suffix = (day) => {
-      if (day > 3 && day < 21) return 'th';
-      switch (day % 10) {
-          case 1: return 'st';
-          case 2: return 'nd';
-          case 3: return 'rd';
-          default: return 'th';
-      }
-  };
-
-  return `${day}${suffix(day)} ${month} ${year}`;
-}
-
-// Mapping transactions with formatted dates
 const transactionsWithFormattedData = transactions.map(transaction => ({
-  id: transaction._id,  // Unique id for each row
-  userName: transaction.user.name,
-  bookTitle: transaction.bookCopy.book.title,
-  borrowedAt: formatReadableDate(transaction.borrowedAt),  // Format borrowedAt
-  dueDate: formatReadableDate(transaction.dueDate),        // Format dueDate
-  returnDate: transaction.returnedAt 
-    ? formatReadableDate(transaction.returnedAt) // Format returnDate if it exists
-    : 'Not yet', 
-  fineAmount: transaction.fineAmount ? `$${transaction.fineAmount.toFixed(2)}` : 'No fine', // Format fine amount
-}));
-
+    id: transaction._id,  // Ensure each row has a unique id
+    userName: transaction.user.name,
+    bookTitle: transaction.bookCopy.book.title,
+    borrowedAt: transaction.borrowedAt,
+    dueDate: transaction.dueDate,
+    fineAmount: transaction.fineAmount,
+  }));
   
   // Set filtered transactions state
   const [filteredTransactions, setFilteredTransactions] = useState(transactionsWithFormattedData);
@@ -167,12 +137,10 @@ const transactionsWithFormattedData = transactions.map(transaction => ({
   };
 
   const columns = [
-    { field: 'id', headerName: 'id', width: 200 },
     { field: 'userName', headerName: 'User Name', width: 200 },
     { field: 'bookTitle', headerName: 'Book', width: 200 },
-    { field: 'borrowedAt', headerName: 'Borrow Date', width: 200 },
-    { field: 'dueDate', headerName: 'Due Date', width: 200 },
-    { field: 'returnDate', headerName: 'Return Date', width: 200 },
+    { field: 'borrowedAt', headerName: 'Borrow Date', width: 200, valueFormatter: ({ value }) => new Date(value).toLocaleDateString() },
+    { field: 'dueDate', headerName: 'Return Date', width: 200, valueFormatter: ({ value }) => new Date(value).toLocaleDateString() },
     { field: 'fineAmount', headerName: 'Fine Amount', width: 150 },
     {
       field: 'actions',
@@ -181,8 +149,11 @@ const transactionsWithFormattedData = transactions.map(transaction => ({
       sortable: false,
       renderCell: (params) => (
         <>
-          <Button variant="info" size="small" onClick={() => console.log("update clicked")} style={{ marginRight: 8 }}>
-            Update
+          <Button variant="info" size="small" onClick={() => handleView(params.row)} style={{ marginRight: 8 }}>
+            <FaEye />
+          </Button>
+          <Button variant="danger" size="small" onClick={() => confirmDelete(params.row.transactionId)}>
+            <FaTrashAlt />
           </Button>
         </>
       ),
@@ -200,7 +171,7 @@ const transactionsWithFormattedData = transactions.map(transaction => ({
         <div className="bg-light">
         <div className="row py-2 px-2">
     <div className="col-8">
-      <h2>All Transactions</h2>
+      <h2>My Overdue</h2>
       </div>
         <div className="col-4 d-flex align-items-center justify-content-end">
       <div className="search-bar">
@@ -324,4 +295,4 @@ const transactionsWithFormattedData = transactions.map(transaction => ({
   );
 };
 
-export default AllTransactions;
+export default PatronOverdueScreen;

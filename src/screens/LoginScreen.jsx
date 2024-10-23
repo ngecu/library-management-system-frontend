@@ -54,7 +54,7 @@ const LoginScreen = ({ location, history }) => {
     <>
       <Container style={{ display: 'flex', justifyContent: 'center', alignItems: 'center',height:"100vh" }}>
       <Spin spinning={isLoading}>
-        <div style={{ boxShadow: 'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px', padding: '20px', width: '800px',background:"#294A70",borderRadius:"20px" }}>
+        <div style={{ boxShadow: 'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px', padding: '20px', width: '800px',background:"#294A70",borderRadius:"20px" }} className='card'>
           <Row>
             <Col md={12} className='text-center'>
               <h1 style={{color:"white"}}>Library Management System</h1>
