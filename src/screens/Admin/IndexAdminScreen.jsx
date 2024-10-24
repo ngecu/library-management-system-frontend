@@ -29,7 +29,7 @@ const IndexAdminScreen = () => {
   const { data: patrons = [], isLoading: isPatronsLoading } = useFetchPatronsQuery();
   const [visible, setVisible] = useState(false);
   const [form] = Form.useForm();
-
+  const [isPatron, setIsPatron] = useState(false);
   const [register, { isLoading:isRegistering, isError, isSuccess }] = useRegisterMutation();
 
   const handleOk = async () => {
@@ -356,7 +356,7 @@ const openNotification = (type, message, description) => {
       name="role"
       rules={[{ required: true, message: 'Please select the role!' }]}
     >
-      <Select placeholder="Select a role">
+      <Select placeholder="Select a role"  onChange={(value) => setIsPatron(value === 'patron')}>
         <Select.Option value="patron">Patron</Select.Option>
         <Select.Option value="librarian">Librarian</Select.Option>
       </Select>
@@ -370,17 +370,17 @@ const openNotification = (type, message, description) => {
       <Input.Password placeholder="Enter password" />
     </Form.Item>
 
-    <Form.Item name="isAdmin" valuePropName="checked">
-      <Checkbox>Is Admin</Checkbox>
-    </Form.Item>
+    {!isPatron && (
+          <Form.Item name="isAdmin" valuePropName="checked">
+            <Checkbox>Is Admin</Checkbox>
+          </Form.Item>
+        )}
 
     <Form.Item name="isActive" valuePropName="checked">
       <Checkbox>Is Active</Checkbox>
     </Form.Item>
 
-    <Form.Item label="Student ID" name="studentID">
-      <Input placeholder="Enter Student ID (optional)" />
-    </Form.Item>
+
   </Form>
 </Modal>
 

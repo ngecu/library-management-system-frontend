@@ -79,6 +79,16 @@ const Layout = () => {
           </li>
           <li>
             <NavLink
+              to="/librarian/e-materials"
+              className={`d-flex align-items-left justify-content-left`}
+              style={{ ...navStyle('/librarian/e-materials'), alignItems: 'center', paddingLeft: '7%' }}
+            >
+              <GiBookshelf />
+              <span className="ml-2">E-Materials</span>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
               to="/librarian/checkout"
               className={`d-flex align-items-left justify-content-left`}
               style={{ ...navStyle('/librarian/checkout'), alignItems: 'center', paddingLeft: '7%' }}

@@ -22,6 +22,7 @@ import PatronOverdueScreen from './screens/Patron/PatronOverdueScree';
 import Profile from './screens/Admin/Profile';
 import Suggestion from './screens/Patron/Suggestion';
 import AdminSuggestionBox from './screens/Admin/AdminSuggestionBox';
+import EMaterialScreen from './screens/Admin/EMaterialScreen';
 
 const App = () => {
 
@@ -48,7 +49,9 @@ const App = () => {
               <Route path="reports" element={<ReportScreen />} />
               <Route path="profile" element={<Profile />} />
               <Route path="suggestion-box" element={<AdminSuggestionBox />} />
+              <Route path="e-materials" element={<EMaterialScreen />} />
 
+              
               
             </Route>
 
