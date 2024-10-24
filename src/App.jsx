@@ -20,6 +20,8 @@ import CheckInScreen from './screens/Admin/CheckInScreen';
 import PatronTransactions from './screens/Patron/PatronTransactionScreen';
 import PatronOverdueScreen from './screens/Patron/PatronOverdueScree';
 import Profile from './screens/Admin/Profile';
+import Suggestion from './screens/Patron/Suggestion';
+import AdminSuggestionBox from './screens/Admin/AdminSuggestionBox';
 
 const App = () => {
 
@@ -45,6 +47,7 @@ const App = () => {
               <Route path="overdue" element={<OverdueScreen />} />
               <Route path="reports" element={<ReportScreen />} />
               <Route path="profile" element={<Profile />} />
+              <Route path="suggestion-box" element={<AdminSuggestionBox />} />
 
               
             </Route>
@@ -55,6 +58,7 @@ const App = () => {
               <Route path="transactions" element={<PatronTransactions />} />
               <Route path="overdue" element={<PatronOverdueScreen />} />
               <Route path="profile" element={<Profile />} />
+              <Route path="suggestion-box" element={<Suggestion />} />
 
             </Route>
 

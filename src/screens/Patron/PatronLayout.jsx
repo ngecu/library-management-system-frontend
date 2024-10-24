@@ -61,7 +61,7 @@ const PatronLayout = () => {
                   selectable: true,
                 }}
               >
-                <div className="d-flex align-items-center">
+                <div style={{cursor:"pointer"}} className="d-flex align-items-center">
                   <span className="me-2">{userDetails.name}</span>
                   <FaRegUserCircle />
                 </div>

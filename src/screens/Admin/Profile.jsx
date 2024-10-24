@@ -1,15 +1,31 @@
 import React from 'react';
 import { useFetchUserQuery, useUpdateUserProfileMutation } from '../../features/userApi'; // Adjust the path as needed
-import { Form, Input, Button, Alert } from 'antd';
+import { Form, Input, Button, Alert,notification  } from 'antd';
 import userImg from '../../assets/user.png'
 const Profile = () => {
   const userDetails = JSON.parse(localStorage.getItem('login'))
   const { data: user, isLoading, isError } = useFetchUserQuery();
   const [updateUserProfile, { isLoading: isUpdating, error }] = useUpdateUserProfileMutation();
 
+
   const handleFinish = async (values) => {
-    await updateUserProfile(values).unwrap();
+    try {
+      await updateUserProfile(values).unwrap();
+      notification.success({
+        message: 'Profile Updated',
+        description: 'Your profile has been updated successfully.',
+      });
+    } catch (err) {
+      notification.error({
+        message: 'Update Failed',
+        description: 'Failed to update your profile. Please try again.',
+      });
+    }
   };
+
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <Alert message="Error fetching user data." type="error" />;
+
 
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <Alert message="Error fetching user data." type="error" />;
@@ -26,8 +42,15 @@ const Profile = () => {
             <img src={userImg} alt="user image"/>
         </div>
         <div class="text-data">
-            <h2>{userDetails.name}</h2>
-            <p>{userDetails.role} </p>
+        {userDetails._id}
+        <br/>
+         <b> Name </b>: {userDetails.name}
+         <br/>
+         <b> Role </b>: {userDetails.role}
+
+         <br/>
+          
+       
         </div>
       
     </section>

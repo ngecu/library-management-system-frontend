@@ -17,14 +17,16 @@ import {
 import { useFetchPatronsQuery, useRegisterMutation } from '../../features/userApi';
 import { Gauge } from '@ant-design/plots';
 import client from '../../assets/client.png'
-import { Modal, Form, Input, Select, Checkbox, Button } from 'antd';
+import { Modal, Form, Input, Select, Checkbox, notification, Spin } from 'antd';
+
+
+
 const IndexAdminScreen = () => {
 
   const location = useLocation();
   const { pathname } = location;
-  const { data: books = [], isLoading } = useFetchBooksQuery();
-  const { data: patrons = [] } = useFetchPatronsQuery();
-
+  const { data: books = [], isLoading: isBooksLoading } = useFetchBooksQuery();
+  const { data: patrons = [], isLoading: isPatronsLoading } = useFetchPatronsQuery();
   const [visible, setVisible] = useState(false);
   const [form] = Form.useForm();
 
@@ -65,6 +67,27 @@ const IndexAdminScreen = () => {
 
   const userDetails = JSON.parse(localStorage.getItem('login'))
 
+  
+const openNotification = (type, message, description) => {
+  notification[type]({
+    message,
+    description,
+    placement: 'topRight', // Positioning the notification at the top right
+    duration: 3, // Duration to display the notification
+  });
+};
+
+  const handleAddUserModal = () => {
+    if (userDetails.isAdmin) {
+      showModal();
+    } else {
+      openNotification(
+        'error', 
+        'Permission Denied', 
+        "You don't have the necessary permissions to add a user."
+      );
+    }
+  };
 
   return (
     <div class="container-fluid">
@@ -72,13 +95,13 @@ const IndexAdminScreen = () => {
     <div class="row pt-3">
  
         <div class="col-xl-3 col-md-6 mb-4">
-          <NavLink to="/librarian/allbooks" style={{textDecoration:"none"}}>
+          <NavLink to="/librarian/allbooks" className="custom-navlink" style={{textDecoration:"none"}}>
           <div class="card h-100">
             <div class="card-body">
               <div class="row no-gutters align-items-center">
                 <div class="col mr-2">
                   <div class="text-xs text-white font-weight-bold text-uppercase mb-1">Books</div>
-                  <div class="h5 mb-0 mr-3 text-white font-weight-bold text-gray-800">{books && books.length}</div>
+                  <div class="h5 mb-0 mr-3 text-white font-weight-bold text-gray-800">{isBooksLoading ? <Spin /> : books.length}</div>
                   <div class="mt-2 mb-0 text-muted text-xs">
                    
                   </div>
@@ -93,7 +116,7 @@ const IndexAdminScreen = () => {
         </div>
 
         <div class="col-xl-3 col-md-6 mb-4">
-                    <NavLink to="/librarian/checkin" style={{textDecoration:"none"}}>
+                    <NavLink to="/librarian/checkin" className="custom-navlink" style={{textDecoration:"none"}}>
                         <div class="card h-100">
                           <div class="card-body">
                             <div class="row no-gutters align-items-center">
@@ -114,7 +137,7 @@ const IndexAdminScreen = () => {
                     </div>
 
                     <div class="col-xl-3 col-md-6 mb-4">
-                    <NavLink to="/librarian/checkout" style={{textDecoration:"none"}}>
+                    <NavLink to="/librarian/checkout" className="custom-navlink" style={{textDecoration:"none"}}>
                       <div class="card h-100">
                         <div class="card-body">
                           <div class="row no-gutters align-items-center">
@@ -135,14 +158,14 @@ const IndexAdminScreen = () => {
                     </div>
 
                     <div class="col-xl-3 col-md-6 mb-4">
-                    <NavLink to="/librarian/patrons" style={{textDecoration:"none"}}>
+                    <NavLink to="/librarian/patrons" className="custom-navlink" style={{textDecoration:"none"}}>
 
           <div class="card h-100">
             <div class="card-body">
               <div class="row align-items-center">
                 <div class="col mr-2">
                   <div class="text-xs text-white font-weight-bold text-uppercase mb-1">Patrons</div>
-                  <div class="h5 text-white mb-0 font-weight-bold text-gray-800">{patrons && patrons.length}</div>
+                  <div class="h5 text-white mb-0 font-weight-bold text-gray-800">{isPatronsLoading ? <Spin/> : patrons.length}</div>
                   <div class="mt-2 mb-0 text-muted text-xs">
                   
                   </div>
@@ -207,7 +230,7 @@ const IndexAdminScreen = () => {
    
 
         <div class="col-xl-6 col-md-6 mb-4">
-        <NavLink to="/librarian/overdue" style={{textDecoration:"none"}}>
+        <NavLink to="/librarian/overdue" className="custom-navlink" style={{textDecoration:"none"}}>
           <div class="card h-100">
             <div class="card-body">
               <div class="row align-items-center">
@@ -229,12 +252,12 @@ const IndexAdminScreen = () => {
         </div>
 
         <div class="col-xl-6 col-md-6 mb-4">
-        <NavLink to="/librarian/transactions" style={{textDecoration:"none"}}>
+        <NavLink to="/librarian/transactions" className="custom-navlink" style={{textDecoration:"none"}}>
           <div class="card h-100">
             <div class="card-body">
               <div class="row align-items-center">
                 <div class="col mr-2">
-                  <div class="text-xs text-white font-weight-bold text-uppercase mb-1">Trans.</div>
+                  <div class="text-xs text-white font-weight-bold text-uppercase mb-1">Loan History</div>
                   <div class="h5 mb-0 font-weight-bold text-gray-800"></div>
                   <div class="mt-2 mb-0 text-muted text-xs">
                   
@@ -251,7 +274,7 @@ const IndexAdminScreen = () => {
         </div>
 
         <div class="col-xl-6 col-md-6 mb-4">
-        <NavLink to="/librarian/reports" style={{textDecoration:"none"}}>
+        <NavLink to="/librarian/reports" className="custom-navlink" style={{textDecoration:"none"}}>
           <div class="card h-100">
             <div class="card-body">
               <div class="row align-items-center">
@@ -273,7 +296,7 @@ const IndexAdminScreen = () => {
 
     
 
-        <div class="col-xl-6 col-md-6 mb-4" onClick={userDetails.isAdmin && showModal}>
+        <div class="col-xl-6 col-md-6 mb-4" style={{cursor:"pointer"}} onClick={handleAddUserModal}>
           <div class="card h-100">
             <div class="card-body">
               <div class="row align-items-center">

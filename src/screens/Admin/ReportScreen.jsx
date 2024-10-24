@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Button, InputGroup } from 'react-bootstrap';
 import { FaEye, FaTrashAlt, FaPrint, FaSearch } from 'react-icons/fa';
-import { DataGrid } from '@mui/x-data-grid';
-import { IoCloudDownloadSharp } from "react-icons/io5";
 import { Drawer, Modal, Spin } from 'antd';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable'; // Ensure AutoTable is imported for PDF
 import { useFetchTransactionsQuery, useBorrowBookMutation, useReturnBookMutation, useRenewBookMutation } from '../../features/transactionApi';
 import { notification } from 'antd';
-import { Gauge } from '@ant-design/plots';
+import { Column, Gauge, Line } from '@ant-design/plots';
+import client from '../../assets/client.png'
 
 const ReportScreen = () => {
   const [showDetailDrawer, setShowDetailDrawer] = useState(false);
@@ -200,18 +199,38 @@ const transactionsWithFormattedData = transactions.map(transaction => ({
         </div>
 
        <div class="col-xl-6 col-md-12 mb-4 h-100">
-         <div class="card h-100">
+         <div class="card h-100" style={{background:"white"}}>
            <div class="card-body">
              <div class="row align-items-center">
                <div class="col mr-2">
-                 <div class="text-xs text-white font-weight-bold text-uppercase mb-1">BOOKS/BORROW RATIO</div>
+                 <div class="text-xs text-dark font-weight-bold text-uppercase mb-1">MOST BORROWED BOOKS</div>
                  <div class="h5 mb-0 font-weight-bold text-gray-800"></div>
                  <div class="mt-2 mb-0 text-muted text-xs">
                  
                  </div>
                </div>
                <div class="col-auto">
-               <DemoGauge />
+               <DemoColumn />
+                
+               </div>
+             </div>
+           </div>
+         </div>
+       </div>
+
+       <div class="col-xl-6 col-md-12 mb-4 h-100">
+         <div class="card h-100" style={{background:"white"}}>
+           <div class="card-body">
+             <div class="row align-items-center">
+               <div class="col mr-2">
+                 <div class="text-xs text-dark font-weight-bold text-uppercase mb-1">LOAN VISUALIZATION</div>
+                 <div class="h5 mb-0 font-weight-bold text-gray-800"></div>
+                 <div class="mt-2 mb-0 text-muted text-xs">
+                 
+                 </div>
+               </div>
+               <div class="col-auto">
+               <DemoLine />
                 
                </div>
              </div>
@@ -224,34 +243,15 @@ const transactionsWithFormattedData = transactions.map(transaction => ({
            <div class="card-body">
              <div class="row align-items-center">
                <div class="col mr-2">
-                 <div class="text-xs text-white font-weight-bold text-uppercase mb-1">BOOKS/BORROW RATIO</div>
+                 <div class="text-xs text-white font-weight-bold text-uppercase mb-1">CLIENT PREFERENCE</div>
                  <div class="h5 mb-0 font-weight-bold text-gray-800"></div>
                  <div class="mt-2 mb-0 text-muted text-xs">
                  
                  </div>
                </div>
                <div class="col-auto">
-               <DemoGauge />
-                
-               </div>
-             </div>
-           </div>
-         </div>
-       </div>
+               <img src={client} style={{width:"100%"}} alt="" />
 
-       <div class="col-xl-6 col-md-12 mb-4 h-100">
-         <div class="card h-100">
-           <div class="card-body">
-             <div class="row align-items-center">
-               <div class="col mr-2">
-                 <div class="text-xs text-white font-weight-bold text-uppercase mb-1">BOOKS/BORROW RATIO</div>
-                 <div class="h5 mb-0 font-weight-bold text-gray-800"></div>
-                 <div class="mt-2 mb-0 text-muted text-xs">
-                 
-                 </div>
-               </div>
-               <div class="col-auto">
-               <DemoGauge />
                 
                </div>
              </div>
@@ -378,8 +378,129 @@ const DemoGauge = () => {
       },
     },
     style: {
-      textContent: (target, total) => `得分：${target}\n占比：${(target / total) * 100}%`,
+      textContent: (target, total) => `${target}\n ${(target / total) * 100}%`,
     },
   };
   return <Gauge {...config} />;
+};
+
+
+
+const DemoColumn = () => {
+  // Updated data to represent book titles
+  const data = [
+    { type: 'The Alchemist', value: 0.16 },
+    { type: 'The Great Gatsby', value: 0.125 },
+    { type: '1984', value: 0.24 },
+    { type: 'To Kill a Mockingbird', value: 0.19 },
+    { type: 'Moby Dick', value: 0.22 },
+    { type: 'War and Peace', value: 0.05 },
+    { type: 'Pride and Prejudice', value: 0.01 },
+    { type: 'The Catcher in the Rye', value: 0.015 },
+  ];
+
+  const config = {
+    data,
+    xField: 'type',
+    yField: 'value',
+    xAxis: {
+      title: {
+        text: 'Book Titles',
+        style: {
+          fill: '#FFFFFF', // Set X-axis title color to white
+        },
+      },
+      label: {
+        style: {
+          fill: '#FFFFFF', // Set X-axis labels color to white
+        },
+      },
+    },
+    yAxis: {
+      title: {
+        text: 'Value',
+        style: {
+          fill: '#FFFFFF', // Set Y-axis title color to white
+        },
+      },
+      label: {
+        style: {
+          fill: '#FFFFFF', // Set Y-axis labels color to white
+        },
+        formatter: (v) => `${(v * 100).toFixed(0)}%`, // Display percentage
+      },
+    },
+    style: {
+      fill: ({ type }) => {
+        // Change colors based on the book type
+        if (type === 'Pride and Prejudice' || type === 'The Catcher in the Rye') {
+          return '#22CBCC';
+        }
+        return '#2989FF';
+      },
+    },
+    label: {
+      text: (originData) => {
+        const val = parseFloat(originData.value);
+        if (val < 0.05) {
+          return (val * 100).toFixed(1) + '%'; // Show labels for values less than 5%
+        }
+        return '';
+      },
+      offset: 10,
+    },
+    tooltip: {
+      showTitle: true,
+      shared: true,
+      showMarkers: false,
+      itemTpl: `<li><span style="color:{color};">{name}: {value}</span></li>`, // Customize tooltip
+    },
+    legend: {
+      position: 'top-right',
+      itemName: {
+        style: {
+          fill: '#FFFFFF', // Set legend text color to white
+        },
+      },
+    },
+  };
+
+  return (
+    <div>
+      <Column {...config} />
+    </div>
+  );
+};
+
+
+const DemoLine = () => {
+  const data = [
+    { year: '04th Jul 2024', value: 3 },
+    { year: '14th Jul 2024', value: 4 },
+    { year: '24th Jul 2024', value: 3.5 },
+    { year: '04th Sep 2024', value: 5 },
+    { year: '14th Sep 2024', value: 4.9 },
+    { year: '24th Sep 2024', value: 6 },
+    { year: '04th Oct 2024', value: 7 },
+    { year: '14th Oct 2024', value: 9 },
+    { year: '24th Oct 2024', value: 13 },
+  ];
+  const config = {
+    data,
+    xField: 'year',
+    yField: 'value',
+    point: {
+      shapeField: 'square',
+      sizeField: 4,
+    },
+    interaction: {
+      tooltip: {
+        marker: false,
+      },
+    },
+    style: {
+      lineWidth: 2,
+    },
+  };
+  return <Line {...config} />;
 };

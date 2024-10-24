@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, message, Select, Spin, Steps } from 'antd';
+import { Form, Input, Button, message, Select, Spin, Steps, Result } from 'antd';
 import { useBorrowBookMutation, useFetchTransactionsByUserQuery } from '../../features/transactionApi';
 import { useFetchBookCopiesQuery, useFetchBooksQuery } from '../../features/booksApi';
 import { useFetchUsersQuery } from '../../features/userApi';
@@ -21,7 +21,7 @@ const CheckoutScreen = () => {
   const [selectedBook, setSelectedBook] = useState(null);
   const [code, setCode] = useState('');
   const [selectedUser, setSelectedUser] = useState(null);
-
+  const [errorMessage, setErrorMessage] = useState(null);
   const [current, setCurrent] = useState(0);
   const { Step } = Steps;
 
@@ -71,6 +71,8 @@ const CheckoutScreen = () => {
 
   // Handle user selection
   const handleUserSelect = (userId) => {
+    console.log("changing");
+    
     setSelectedUser(userId);
   };
 
@@ -84,7 +86,30 @@ const formatDate = (date) => {
   return date.toISOString().split('T')[0]; // Formats date as YYYY-MM-DD
 };
 
-  const { data: userTransactions, isLoading: transactionsLoading } = useFetchTransactionsByUserQuery(selectedUser, { skip: !selectedUser });
+  const { data: userTransactions, isLoading: transactionsLoading,error } = useFetchTransactionsByUserQuery(selectedUser, { skip: !selectedUser });
+
+  
+// Effect to handle userTransactions changes
+useEffect(() => {
+  if (userTransactions) {
+    console.log("User Transactions Updated: ", userTransactions);
+    setErrorMessage(null); // Clear any previous error messages
+  }
+}, [userTransactions]);
+  
+ // Handle API errors
+ useEffect(() => {
+  if (error) {
+    console.log("error.status ",error.status);
+    
+    if (error.status === 404) {
+      setErrorMessage("User transactions not found.");
+    } else {
+      setErrorMessage("An error occurred while fetching transactions.");
+    }
+  }
+}, [error]); // This effect runs whenever the error changes
+
 
   const onScanSuccess = (decodedText) => {
     console.log(decodedText);
@@ -108,10 +133,20 @@ const formatDate = (date) => {
   const hasNextButton = () => {
     if (current === 0) {
       if (!selectedUser) return false;
-      const fineAmountExceeded = userTransactions?.some(transaction => transaction.fineAmount > 0);
-      const hasNoTransactions = !userTransactions?.length;
-
-      return hasNoTransactions || fineAmountExceeded;
+      if(error && error.status === 404){
+        return true
+      }
+      else{
+        const fineAmountExceeded = userTransactions?.some(transaction => transaction.fineAmount > 0);
+        const allBooksReturned = userTransactions?.every(transaction => transaction.isReturned);
+  
+        console.log(userTransactions,allBooksReturned);
+        
+        const hasNoTransactions = !userTransactions?.length;
+  
+        return hasNoTransactions || fineAmountExceeded || allBooksReturned;
+      }
+   
     } else if (current === 1) {
       if (!code || !books.some(copy => copy._id === code && copy.isAvailable)) return false;
     }
@@ -145,67 +180,34 @@ const formatDate = (date) => {
         filterOption={(input, option) =>
           (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
         }
-        options={users?.map(user => ({
-          key: user._id,
-          label: user.name,
-          value: user._id
-        }))}
+        options={users
+          ?.filter(user => user.role === 'patron') // Filter for users with role "patron"
+          .map(user => ({
+            key: user._id,
+            label: user.name,
+            value: user._id
+          }))
+        }
+        
       />
       {selectedUser && (
-        <div style={{ marginTop: '16px' }}>
-          {transactionsLoading ? (
-            <Spin />
-          ) : (
-            <Row>
-          <Col md={6} style={{ boxShadow: 'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px',borderRadius:"20px" }}>
-
-<section class="box">
-<div class="content">
-
-<div class="left">
-<div class="reader_img"></div>
-
-</div>
-
-<div class="right">
-<div class="product_description">
-<h4>BORROWER DETAILS</h4>
-<p><span class="highlight">Name-</span>
-{users &&  users.find(user => user._id === selectedUser)?.name}
-</p>
-<p><span class="highlight">Email - </span>
-{users &&  users.find(user => user._id === selectedUser)?.email}
-
-</p>
-<p><span class="highlight">Student ID -</span>
-{users &&  users.find(user => user._id === selectedUser)?.studentID}
-
-</p>
-
-</div>
-</div>
-
-</div>
-</section>
-
-</Col>
-              <Col md={6} style={{ boxShadow: 'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px',borderRadius:"20px" }}>
-                <h3>Transaction History</h3>
-                {userTransactions?.length ? (
-                  <ul>
-                    {userTransactions.map(transaction => (
-                      <li key={transaction._id}>
-                        <strong>Book:</strong> {transaction.bookTitle} | <strong>Date:</strong> {new Date(transaction.borrowedAt).toLocaleDateString()} | <strong>Fine Amount:</strong> {transaction.fineAmount}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p>No transaction history for this user.</p>
-                )}
-              </Col>
-            </Row>
-          )}
-        </div>
+       <>
+        { (error  || (userTransactions && userTransactions.every(transaction => transaction.isReturned) )) ? (
+          <Result
+          status="success"
+          title={`Patron doesn't have unreturned books`}
+          
+        />
+        ): 
+        <Result
+        status="500"
+        title="Patron has pending loan book"
+        subTitle="Sorry, Patron cannot proceed"
+       
+      />
+        
+        }
+       </>
       )}
     </div>,
 

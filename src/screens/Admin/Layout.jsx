@@ -9,6 +9,8 @@ import { FaAnglesDown, FaAnglesUp, FaUsers } from 'react-icons/fa6';
 import { AiOutlineTransaction } from 'react-icons/ai';
 import { BsEmojiAngryFill } from 'react-icons/bs';
 import { HiDocumentReport } from 'react-icons/hi';
+import home from "../../assets/home.jpeg"
+import { VscFeedback } from "react-icons/vsc";
 
 const openNotification = (type, message, description) => {
   notification[type]({
@@ -50,7 +52,9 @@ const Layout = () => {
         <ul className="sidebar-nav">
           <li className="sidebar-brand">
             <NavLink to="/librarian">
-              Library Management System
+            <img style={{width:"50px",height:"50px",borderRadius:"50%"}} src={home} alt="" />
+            <span style={{marginLeft:"20px"}}>Library Mgt Sys</span>
+
             </NavLink>
           </li>
           <li>
@@ -100,7 +104,7 @@ const Layout = () => {
               style={{ ...navStyle('/librarian/transactions'), alignItems: 'center', paddingLeft: '7%' }}
             >
               <AiOutlineTransaction />
-              <span className="ml-2">Transactions</span>
+              <span className="ml-2">Loan History</span>
             </NavLink>
           </li>
           <li>
@@ -133,6 +137,16 @@ const Layout = () => {
               <span className="ml-2">Reports</span>
             </NavLink>
           </li>
+          <li>
+            <NavLink
+              to="/librarian/suggestion-box"
+              className={`d-flex align-items-left justify-content-left`}
+              style={{ ...navStyle('/librarian/suggestion-box'), alignItems: 'center', paddingLeft: '7%' }}
+            >
+              <VscFeedback />
+              <span className="ml-2">Suggestion Box</span>
+            </NavLink>
+          </li>
         </ul>
       </div>
 
@@ -147,13 +161,13 @@ const Layout = () => {
             <Dropdown
     menu={{
       items: [
-        { key: '1', label: <NavLink to='/librarian/profile'>Profile</NavLink> },
+        { key: '1', label: <NavLink style={{textDecoration:"none"}} to='/librarian/profile'>Profile</NavLink> },
         { key: '2', label: <a onClick={handleLogout}>Logout</a> },
       ],
       selectable: true,
     }}
   >
-    <div className="d-flex align-items-center">
+    <div style={{cursor:"pointer"}} className="d-flex align-items-center">
       <span className="me-2">{userDetails.name}</span>
       <FaRegUserCircle />
     </div>
