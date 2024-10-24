@@ -74,65 +74,74 @@ const transactionsWithFormattedData = transactions.map(transaction => ({
   // Set filtered transactions state
   const [filteredTransactions, setFilteredTransactions] = useState(transactionsWithFormattedData);
   
-  // Update the effect hook to filter on the formatted transactions
-  useEffect(() => {
-    if (searchQuery.trim() === '') {
-      setFilteredTransactions(transactionsWithFormattedData);
-    } else {
-      const filtered = transactionsWithFormattedData.filter(transaction =>
-        transaction.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        transaction.bookTitle.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredTransactions(filtered);
-    }
-  }, [searchQuery, transactions]);
+    // Update the effect hook to filter on the formatted transactions
+    useEffect(() => {
+      if (searchQuery.trim() === '') {
+        setFilteredTransactions(transactionsWithFormattedData);
+      } else {
+        const filtered = transactionsWithFormattedData.filter(transaction =>
+          transaction.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          transaction.bookTitle.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        setFilteredTransactions(filtered);
+      }
+    }, [searchQuery, transactionsWithFormattedData]);
   
   
 
   // Generate PDF
-  const generatePDF = (transactions) => {
+  const generatePDF = () => {
     const doc = new jsPDF();
     const tableRows = [];
-
+  
     const columns = [
-      { header: 'Transaction ID', field: 'transactionId' },
-      { header: 'User ID', field: 'userId' },
-      { header: 'Amount', field: 'amount' },
-      { header: 'Date', field: 'date' },
-      { header: 'Status', field: 'status' }
+      { header: 'User Name', field: 'userName' },
+      { header: 'Book Title', field: 'bookTitle' },
+      { header: 'Borrow Date', field: 'borrowedAt' },
+      { header: 'Due Date', field: 'dueDate' },
+      { header: 'Return Date', field: 'returnDate' },
+      { header: 'Fine Amount', field: 'fineAmount' }
     ];
-
-    transactions.forEach((transaction) => {
-      const rowArray = [];
-      columns.forEach((column) => {
-        rowArray.push(transaction[column.field]);
-      });
+  
+    filteredTransactions.forEach((transaction) => {
+      const rowArray = columns.map((column) => transaction[column.field] || ''); // Add a default value if undefined
       tableRows.push(rowArray);
     });
-
-    doc.autoTable(columns.map(col => col.header), tableRows, { theme: 'grid' });
+  
+    // Check the structure of tableRows
+    console.log(tableRows);
+  
+    doc.autoTable({
+      head: [columns.map(col => col.header)], // Use `head` instead of mapping headers separately
+      body: tableRows,
+      theme: 'grid',
+      styles: { fontSize: 10 }, // Optional: Adjust font size
+      margin: { top: 20 } // Optional: Adjust margins if needed
+    });
+  
     doc.save('Transactions_List.pdf');
   };
+  
 
-  // Generate CSV
-  const generateCSV = (transactions) => {
+  const generateCSV = () => {
     const SEPARATOR = ',';
     let csvContent = 'data:text/csv;charset=utf-8,';
-    const headers = ['Transaction ID', 'User ID', 'Amount', 'Date', 'Status'];
-
+    const headers = ['User Name', 'Book Title', 'Borrow Date', 'Due Date', 'Return Date', 'Fine Amount'];
+  
     csvContent += headers.join(SEPARATOR) + '\r\n';
-
-    transactions.forEach((transaction) => {
+  
+    filteredTransactions.forEach((transaction) => {
       const rowArray = [
-        transaction.transactionId,
-        transaction.userId,
-        transaction.amount,
-        transaction.date,
-        transaction.status,
+        transaction.userName,
+        transaction.bookTitle,
+        transaction.borrowedAt,
+        transaction.dueDate,
+        transaction.returnDate,
+        transaction.fineAmount,
       ];
       csvContent += rowArray.join(SEPARATOR) + '\r\n';
     });
-
+  
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
@@ -182,7 +191,7 @@ const transactionsWithFormattedData = transactions.map(transaction => ({
       renderCell: (params) => (
         <>
           <Button variant="info" size="small" onClick={() => console.log("update clicked")} style={{ marginRight: 8 }}>
-            Update
+            Check Fine
           </Button>
         </>
       ),
@@ -200,14 +209,14 @@ const transactionsWithFormattedData = transactions.map(transaction => ({
         <div className="bg-light">
         <div className="row py-2 px-2">
     <div className="col-8">
-      <h2>All Transactions</h2>
+      <h2>All Loan History</h2>
       </div>
         <div className="col-4 d-flex align-items-center justify-content-end">
       <div className="search-bar">
         <InputGroup>
           <Form.Control
             type="text"
-            placeholder="Search .."
+            placeholder="Search by Patron or Book"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />

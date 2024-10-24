@@ -71,6 +71,8 @@ const CheckoutScreen = () => {
 
   // Handle user selection
   const handleUserSelect = (userId) => {
+    console.log("changing");
+    
     setSelectedUser(userId);
   };
 
@@ -145,11 +147,15 @@ const formatDate = (date) => {
         filterOption={(input, option) =>
           (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
         }
-        options={users?.map(user => ({
-          key: user._id,
-          label: user.name,
-          value: user._id
-        }))}
+        options={users
+          ?.filter(user => user.role === 'patron') // Filter for users with role "patron"
+          .map(user => ({
+            key: user._id,
+            label: user.name,
+            value: user._id
+          }))
+        }
+        
       />
       {selectedUser && (
         <div style={{ marginTop: '16px' }}>
@@ -177,8 +183,8 @@ const formatDate = (date) => {
 {users &&  users.find(user => user._id === selectedUser)?.email}
 
 </p>
-<p><span class="highlight">Student ID -</span>
-{users &&  users.find(user => user._id === selectedUser)?.studentID}
+<p>
+{users &&  users.find(user => user._id === selectedUser)?._id}
 
 </p>
 

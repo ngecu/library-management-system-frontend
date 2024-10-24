@@ -23,12 +23,10 @@ const AllBooks = () => {
     title: '',
     author: '',
     isbn: '',
-    genre: '',
+    llc: '',
     availableCopies: 1,
     totalCopies: 1,
     isAvailable: true,
-    lccClassification: '',
-    callNumber: '',
   });
   const [selectedBook, setSelectedBook] = useState(null); // Store selected book for editing and viewing
   const [deleteBookId, setDeleteBookId] = useState(null); // Store book ID for deletion
@@ -40,6 +38,7 @@ const AllBooks = () => {
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
+  
   
 const { data: books = [], isLoading } = useFetchBooksQuery();
 const { data: genres = [], isLoading: isLoadingGenres } = useFetchGenresQuery();
@@ -71,22 +70,34 @@ const handleChange = (e) => {
 
 const handleSubmit = async (e) => {
   e.preventDefault();
-  if (selectedBook) {
-    // Update existing book
-    await updateBook({ id: selectedBook._id, ...formData });
-  } else {
-    // Add new book
-    const {data} = await addBook(formData);
-    console.log("new copies ",data);
-    
-    setBookCopies(data.bookCopies); 
-    openNotification('success', 'Success', 'Book added successfully!');
-    setShowPrintBarcodes(true); // Show the print barcodes component
+  
+  // Show loading notification
+  openNotification('info', 'Loading...', 'Please wait while we process your request.');
+
+  try {
+    if (selectedBook) {
+      // Update existing book
+      await updateBook({ id: selectedBook._id, ...formData });
+      openNotification('success', 'Success', 'Book updated successfully!');
+    } else {
+      // Add new book
+      const { data } = await addBook(formData);
+      console.log("new copies ", data);
+      
+      setBookCopies(data.bookCopies); 
+      openNotification('success', 'Success', 'Book added successfully!');
+      setShowPrintBarcodes(true); // Show the print barcodes component
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    openNotification('error', 'Error', error.response?.data?.message || 'Something went wrong!');
+  } finally {
+    handleClose();
+    setShowEditDrawer(false); // Close the edit drawer after submission
+    setSelectedBook(null); // Clear selected book
   }
-  handleClose();
-  setShowEditDrawer(false); // Close the edit drawer after submission
-  setSelectedBook(null); // Clear selected book
 };
+
 
 const handleEdit = (book) => {
   setSelectedBook(book);
@@ -94,7 +105,7 @@ const handleEdit = (book) => {
     title: book.title,
     author: book.author,
     isbn: book.isbn,
-    genre: book.genre,
+    llc: book.llc,
     availableCopies: book.availableCopies,
     totalCopies: book.totalCopies,
     isAvailable: book.isAvailable,
@@ -120,41 +131,43 @@ const confirmDelete = (bookId) => {
   setDeleteBookId(bookId); // Set the book ID for confirmation
 };
 
-  const columns = [
-    { field: 'title', headerName: 'Title', width: 200 },
-    { field: 'author', headerName: 'Author', width: 200 },
-    {
-      field: 'actions',
-      headerName: 'Actions',
-      width: 200,
-      sortable: false,
-      renderCell: (params) => (   
-            <>
-              <Button
-                variant="contained"
-                color="info"
-                size="small"
-                onClick={() => handleView(params.row)}
-                style={{ marginRight: 8 }}
-                disabled={!isAdmin}
-              >
-                <FaEye />
-              </Button>
-        
-              <Button
-                variant="contained"
-                color="error"
-                size="small"
-                onClick={() => confirmDelete(params.row._id)}
-                 disabled={!isAdmin}
-              >
-                <FaTrashAlt color="red" />
-              </Button>
-            </>
-     
-      ),
-    },
-  ];
+
+
+const columns = [
+  { field: 'title', headerName: 'Title', width: 200 },
+  { field: 'author', headerName: 'Author', width: 200 },
+  { field: 'llc', headerName: 'LLC Classification', width: 200 }, // This will now display llc.name
+  {
+    field: 'actions',
+    headerName: 'Actions',
+    width: 200,
+    sortable: false,
+    renderCell: (params) => (   
+      <>
+        <Button
+          variant="contained"
+          color="info"
+          size="small"
+          onClick={() => handleView(params.row)}
+          style={{ marginRight: 8 }}
+          disabled={!isAdmin}
+        >
+          <FaEye />
+        </Button>
+    
+        <Button
+          variant="contained"
+          color="error"
+          size="small"
+          onClick={() => confirmDelete(params.row._id)}
+          disabled={!isAdmin}
+        >
+          <FaTrashAlt color="red" />
+        </Button>
+      </>
+    ),
+  },
+];
 
 
   const generatePDF = (books) => {
@@ -165,7 +178,7 @@ const confirmDelete = (bookId) => {
     const columns = [
       { header: 'Title', field: 'title' },
       { header: 'Author', field: 'author' },
-      { header: 'Genre', field: 'genre' },
+      { header: 'LLC Classification', field: 'llc' },
       { header: 'Available', field: 'isAvailable' },
     ];
   
@@ -209,7 +222,7 @@ const confirmDelete = (bookId) => {
     const SEPARATOR = ','; // Separator for CSV
   
     let csvContent = 'data:text/csv;charset=utf-8,'; // CSV content starts as an empty string with UTF-8 encoding
-    const headers = ['Title', 'Author', 'Genre', 'Available']; // Headers for the CSV file
+    const headers = ['Title', 'Author', 'LLC', 'Available']; // Headers for the CSV file
   
     const row = headers.join(SEPARATOR); // Join headers with separator
     csvContent += row + '\r\n'; // Add the row to the CSV content followed by a new line
@@ -220,7 +233,7 @@ const confirmDelete = (bookId) => {
       
       rowArray.push(book.title); // Add book title
       rowArray.push(book.author); // Add book author
-      rowArray.push(book.genre); // Add book genre
+      rowArray.push(book.llc); // Add book genre
       rowArray.push(book.isAvailable ? 'Yes' : 'No'); // Add availability (Yes/No)
   
       const row = rowArray.join(SEPARATOR); // Join row elements with separator
@@ -247,11 +260,9 @@ const confirmDelete = (bookId) => {
       <h3>{selectedBook?.title}</h3>
       <p><strong>Author:</strong> {selectedBook?.author}</p>
       <p><strong>ISBN:</strong> {selectedBook?.isbn}</p>
-      <p><strong>Genre:</strong> {selectedBook?.genre?.name}</p>
-      <p><strong>Available Copies:</strong> {selectedBook?.availableCopies}</p>
+      <p><strong>LLC:</strong> {selectedBook?.llc?.name}</p>
       <p><strong>Total Copies:</strong> {selectedBook?.totalCopies}</p>
       <p><strong>Available:</strong> {selectedBook?.isAvailable ? 'Yes' : 'No'}</p>
-      <p><strong>LCC Classification:</strong> {selectedBook?.lccClassification}</p>
       <p><strong>Call Number:</strong> {selectedBook?.callNumber}</p>
     </div>
   );
@@ -294,11 +305,11 @@ const confirmDelete = (bookId) => {
       </Form.Group>
 
       <Form.Group controlId="genre">
-        <Form.Label>Genre</Form.Label>
+        <Form.Label>LLC</Form.Label>
         <Form.Control
           type="text"
-          name="genre"
-          value={formData.genre.name}
+          name="llc"
+          value={formData.llc.name}
           onChange={handleChange}
         />
       </Form.Group>
@@ -316,16 +327,7 @@ const confirmDelete = (bookId) => {
         />
       </Form.Group>
 
-      <Form.Group controlId="callNumber">
-        <Form.Label>Call Number</Form.Label>
-        <Form.Control
-          type="text"
-          name="callNumber"
-          value={formData.callNumber}
-          onChange={handleChange}
-          required
-        />
-      </Form.Group>
+
 
       <Button style={{border:"solid #FFB71D",background:"#FFB71D",color:"#535266",borderRadius:"40px"}} className='w-100' type="submit" htmlType="submit" data-cy="login-btn">      
         Submit
@@ -337,15 +339,20 @@ const confirmDelete = (bookId) => {
    // State to keep track of search input
    const [searchQuery, setSearchQuery] = useState('');
    // State to store filtered books
-   const booksWithId = books.map(book => ({ ...book, id: book._id }));
- 
+   const booksWithId = books.map(book => ({
+    ...book,
+    id: book._id,
+    llc: book.llc ? book.llc.name : '', // Extract the name from the llc object
+  })); 
+
+  
    
    const [filteredBooks, setFilteredBooks] = useState(booksWithId);
  
    // Effect to filter books when searchQuery changes
    useEffect(() => {
      if (searchQuery.trim() === '') {
-       setFilteredBooks(books); // Show all books if search query is empty
+       setFilteredBooks(booksWithId); // Show all books if search query is empty
      } else {
        // Filter books based on the search query (case-insensitive)
        const filtered = books.filter(book => 
@@ -377,7 +384,7 @@ const confirmDelete = (bookId) => {
         placeholder="Search..."     
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)} />
-        <Button variant="outline-secondary" id="button-search">
+        <Button variant="primary" id="button-search">
           <FaSearch />
         </Button>
       </InputGroup>
@@ -466,31 +473,22 @@ const confirmDelete = (bookId) => {
           </Form.Group>
 
           <Form.Group controlId="genre">
-        <Form.Label>Genre</Form.Label>
+        <Form.Label>LLC</Form.Label>
         <Form.Control
           as="select"
-          name="genre"
-          value={formData.genre} // Ensure formData.genre is a string or the ID of the selected genre
+          name="llc"
+          value={formData.llc} // Ensure formData.genre is a string or the ID of the selected genre
           onChange={handleChange}
           required
         >
-          <option value="">Select Genre</option>
+          <option value="">Select LCC Classification</option>
           {!isLoadingGenres && genres.map((genre) => (
             <option key={genre._id} value={genre._id}>{genre.name}</option>
           ))}
         </Form.Control>
       </Form.Group>
 
-          <Form.Group controlId="availableCopies">
-            <Form.Label>Available Copies</Form.Label>
-            <Form.Control
-              type="number"
-              name="availableCopies"
-              value={formData.availableCopies}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
+    
 
           <Form.Group controlId="totalCopies">
             <Form.Label>Total Copies</Form.Label>
@@ -503,37 +501,6 @@ const confirmDelete = (bookId) => {
             />
           </Form.Group>
 
-          <Form.Group controlId="isAvailable">
-            <Form.Check
-              type="checkbox"
-              label="Available"
-              name="isAvailable"
-              checked={formData.isAvailable}
-              onChange={handleChange}
-            />
-          </Form.Group>
-
-          <Form.Group controlId="lccClassification">
-            <Form.Label>LCC Classification</Form.Label>
-            <Form.Control
-              type="text"
-              name="lccClassification"
-              value={formData.lccClassification}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
-
-          <Form.Group controlId="callNumber">
-            <Form.Label>Call Number</Form.Label>
-            <Form.Control
-              type="text"
-              name="callNumber"
-              value={formData.callNumber}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
 
           <Button variant="primary" type="submit" style={{ marginTop: '10px' }}>
             Submit
