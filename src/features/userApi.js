@@ -4,7 +4,6 @@ import { host } from '../../environment';
 const user = JSON.parse(localStorage.getItem("login"));
 const token = user?.token;
 const base_url = `${host}/users`;
-console.log("tokenn ", token);
 
 export const userApi = createApi({
   reducerPath: 'userApi',

@@ -100,7 +100,7 @@ const Layout = () => {
               style={{ ...navStyle('/librarian/transactions'), alignItems: 'center', paddingLeft: '7%' }}
             >
               <AiOutlineTransaction />
-              <span className="ml-2">Transactions</span>
+              <span className="ml-2">Loan History</span>
             </NavLink>
           </li>
           <li>

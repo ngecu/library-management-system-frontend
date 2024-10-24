@@ -5,6 +5,8 @@
   background-color: #ECF0F6;
 }
 
+
+
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -37,6 +39,18 @@
  background-color: #294A70 !important;
  border-radius: 20px;
  box-shadow: rgba(136, 165, 191, 0.48) 6px 2px 16px 0px, rgba(255, 255, 255, 0.8) -6px -2px 16px 0px;
+}
+
+
+.custom-navlink .card {
+  text-decoration: none;
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.custom-navlink .card:hover {
+  transform: scale(1.1); /* Zoom effect */
+  background: linear-gradient(45deg, #12ABD9, #B8D53F, #FFB71C); /* Gradient background */
+  color: white;
 }
 
 .read-the-docs {
