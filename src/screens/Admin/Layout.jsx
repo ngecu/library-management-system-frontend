@@ -9,6 +9,7 @@ import { FaAnglesDown, FaAnglesUp, FaUsers } from 'react-icons/fa6';
 import { AiOutlineTransaction } from 'react-icons/ai';
 import { BsEmojiAngryFill } from 'react-icons/bs';
 import { HiDocumentReport } from 'react-icons/hi';
+import home from "../../assets/home.jpeg"
 
 const openNotification = (type, message, description) => {
   notification[type]({
@@ -50,7 +51,9 @@ const Layout = () => {
         <ul className="sidebar-nav">
           <li className="sidebar-brand">
             <NavLink to="/librarian">
-              Library Management System
+            <img style={{width:"50px",height:"50px",borderRadius:"50%"}} src={home} alt="" />
+            <span style={{marginLeft:"20px"}}>Library Mgt Sys</span>
+
             </NavLink>
           </li>
           <li>
@@ -147,13 +150,13 @@ const Layout = () => {
             <Dropdown
     menu={{
       items: [
-        { key: '1', label: <NavLink to='/librarian/profile'>Profile</NavLink> },
+        { key: '1', label: <NavLink style={{textDecoration:"none"}} to='/librarian/profile'>Profile</NavLink> },
         { key: '2', label: <a onClick={handleLogout}>Logout</a> },
       ],
       selectable: true,
     }}
   >
-    <div className="d-flex align-items-center">
+    <div style={{cursor:"pointer"}} className="d-flex align-items-center">
       <span className="me-2">{userDetails.name}</span>
       <FaRegUserCircle />
     </div>

@@ -3,7 +3,10 @@ import { host } from '../../environment';
 
 const user = JSON.parse(localStorage.getItem("login"));
 const token = user?.token;
+console.log("token is ",token);
+
 const base_url = `${host}/users`;
+
 
 export const userApi = createApi({
   reducerPath: 'userApi',
