@@ -9,7 +9,7 @@ import { useFetchBooksQuery } from '../../features/booksApi';
 import { useFetchPatronsQuery } from '../../features/userApi';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
-
+import { VscFeedback } from "react-icons/vsc";
 
 const IndexPatronScreen = () => {
 
@@ -44,8 +44,25 @@ const IndexPatronScreen = () => {
  <div className="row">
 
  <div className="col-xl-12 col-md-12 mb-4">
- {formatDate(currentTime)} {formatTime(currentTime)}
-  </div>
+
+              <NavLink to="/patron/suggestion-box" style={{ textDecoration: "none" }}>
+                <div className="card h-100">
+                  <div className="card-body">
+                    <div className="row align-items-center">
+                      <div className="col mr-2">
+                        <div className="text-xs text-white font-weight-bold text-uppercase mb-1">Give Book Suggestion</div>
+                      </div>
+                      <div className="col-auto">
+                      <VscFeedback size={64} color="white" />
+                       
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </NavLink>
+
+        </div>
+
 
  <div className="col-xl-6 col-md-12 mb-4">
           <NavLink to="/patron/allbooks" style={{ textDecoration: "none" }}>
@@ -107,6 +124,12 @@ const IndexPatronScreen = () => {
         </div>
         </div>
         <div className="col-xl-6 col-md-6 mb-4">
+
+                  
+ <div className="col-xl-12 col-md-12 mb-4">
+ {formatDate(currentTime)} {formatTime(currentTime)}
+  </div>
+
         <Calendar  />
           </div>
 

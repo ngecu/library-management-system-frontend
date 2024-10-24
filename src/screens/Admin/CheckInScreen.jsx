@@ -26,6 +26,7 @@ const CheckInScreen = () => {
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
   const [current, setCurrent] = useState(0);
+  
   const { Step } = Steps;
 
   const next = () => {
@@ -88,6 +89,7 @@ const formatDate = (date) => {
 };
 
 const { data: userTransactions, isLoading: transactionsLoading, error } = useFetchTransactionsByUserQuery(selectedUser, { skip: !selectedUser });
+console.log("userTransactions ",userTransactions);
 
 // Effect to handle userTransactions changes
 useEffect(() => {
@@ -198,75 +200,84 @@ useEffect(() => {
           }))
         }
       />
-     {selectedUser && (
-      <div style={{ marginTop: '16px' }}>
-        {transactionsLoading ? (
-          <Spin />
-        ) : (
-          <>
-            {error ? (
-              <Result
-                status={error.status === 404 ? "404" : "500"}
-                title={error.status === 404 ? "404" : "500"}
-                subTitle={error.status === 404 ? "User has no loan history." : "An error occurred while fetching transactions."}
-              />
-            ) : userTransactions ? (
-              <Row>
-                <Col md={6} style={{ boxShadow: 'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px', borderRadius: "20px" }}>
-                  <section className="box">
-                    <div className="content">
-                      <div className="left">
-                        <div className="reader_img"></div>
-                      </div>
-                      <div className="right">
-                        <div className="product_description">
-                          <h4>BORROWER DETAILS</h4>
-                          <p><span className="highlight">Name-</span>
-                            {users && users.find(user => user._id === selectedUser)?.name}
-                          </p>
-                          <p><span className="highlight">Email - </span>
-                            {users && users.find(user => user._id === selectedUser)?.email}
-                          </p>
-                          <p><span className="highlight">Student ID -</span>
-                            {users && users.find(user => user._id === selectedUser)?.studentID}
-                          </p>
-                        </div>
+{selectedUser && (
+  <div style={{ marginTop: '16px' }}>
+    {transactionsLoading ? (
+      <Spin />
+    ) : (
+      <>
+        {error ? (
+          <Result
+            status={error.status === 404 ? "404" : "500"}
+            title={error.status === 404 ? "404" : "500"}
+            subTitle={error.status === 404 ? "User has no loan history." : "An error occurred while fetching transactions."}
+          />
+        ) : userTransactions ? (
+          userTransactions.every(transaction => transaction.isReturned) ? (
+            <Result
+              status="404"
+              title="404"
+              subTitle="All books have been returned. No outstanding transactions."
+            />
+          ) : (
+            <Row>
+              <Col md={6} style={{ boxShadow: 'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px', borderRadius: "20px" }}>
+                <section className="box">
+                  <div className="content">
+                    <div className="left">
+                      <div className="reader_img"></div>
+                    </div>
+                    <div className="right">
+                      <div className="product_description">
+                        <h4>BORROWER DETAILS</h4>
+                        <p><span className="highlight">Name-</span>
+                          {users && users.find(user => user._id === selectedUser)?.name}
+                        </p>
+                        <p><span className="highlight">Email - </span>
+                          {users && users.find(user => user._id === selectedUser)?.email}
+                        </p>
+                        <p><span className="highlight">Student ID -</span>
+                          {users && users.find(user => user._id === selectedUser)?.studentID}
+                        </p>
                       </div>
                     </div>
-                  </section>
-                </Col>
-                <Col md={6} style={{ boxShadow: 'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px', borderRadius: "20px" }}>
-                  <h3>Transaction History</h3>
-                  {userTransactions.length ? (
-                    <ul>
-                      {userTransactions.map(transaction => (
-                        <li key={transaction._id}>
-                          <strong>Book:</strong> {transaction.bookTitle} | <strong>Date:</strong> {new Date(transaction.borrowedAt).toLocaleDateString()} | <strong>Fine Amount:</strong> {transaction.fineAmount}
-                          {!transaction.returned && <span style={{ color: 'red' }}> (Not Returned)</span>}
-                          {transaction.fineAmount > 0 && (
-                            <Button type="danger" onClick={() => handleMpesaPayment(transaction.fineAmount)}>
-                              Pay with Mpesa
-                            </Button>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p>No transaction history for this user.</p>
-                  )}
-                </Col>
-              </Row>
-            ) : (
-              <Result
-                status="500"
-                title="500"
-                subTitle="This user doesn't have a book"
-              />
-            )}
-          </>
+                  </div>
+                </section>
+              </Col>
+              <Col md={6} style={{ boxShadow: 'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px', borderRadius: "20px" }}>
+                <h3>Transaction History</h3>
+                {userTransactions.length ? (
+                  <ul>
+                    {userTransactions.map(transaction => (
+                      <li key={transaction._id}>
+                        <strong>Book:</strong> {transaction.bookTitle} | <strong>Date:</strong> {new Date(transaction.borrowedAt).toLocaleDateString()} | <strong>Fine Amount:</strong> {transaction.fineAmount}
+                        {!transaction.isReturned ? <span style={{ color: 'red' }}> (Not Returned)</span> : <span style={{ color: 'green' }}> (Returned)</span> }
+                        {transaction.fineAmount > 0 && (
+                          <Button type="danger" onClick={() => handleMpesaPayment(transaction.fineAmount)}>
+                            Pay with Mpesa
+                          </Button>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>No transaction history for this user.</p>
+                )}
+              </Col>
+            </Row>
+          )
+        ) : (
+          <Result
+            status="500"
+            title="500"
+            subTitle="This user doesn't have a book"
+          />
         )}
-      </div>
+      </>
     )}
+  </div>
+)}
+
 
     </div>,
 

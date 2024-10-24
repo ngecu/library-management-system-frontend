@@ -5,6 +5,7 @@ import { mpesaApi } from './features/mpesaApi';
 import { booksApi } from './features/booksApi';
 import { transactionApi } from './features/transactionApi';
 import { genreApi } from './features/genreApi';
+import { suggestionApi } from './features/suggestionApi';
 
 
 export const store = configureStore({
@@ -14,6 +15,7 @@ export const store = configureStore({
     [booksApi.reducerPath]: booksApi.reducer,
     [transactionApi.reducerPath]: transactionApi.reducer,
     [genreApi.reducerPath]: genreApi.reducer,
+    [suggestionApi.reducerPath]: suggestionApi.reducer,
 
     
   },
@@ -24,6 +26,7 @@ export const store = configureStore({
       booksApi.middleware,
       transactionApi.middleware,
       genreApi.middleware,
+      suggestionApi.middleware,
 
     ),
 });

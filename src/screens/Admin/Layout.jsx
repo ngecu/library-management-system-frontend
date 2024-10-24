@@ -10,6 +10,7 @@ import { AiOutlineTransaction } from 'react-icons/ai';
 import { BsEmojiAngryFill } from 'react-icons/bs';
 import { HiDocumentReport } from 'react-icons/hi';
 import home from "../../assets/home.jpeg"
+import { VscFeedback } from "react-icons/vsc";
 
 const openNotification = (type, message, description) => {
   notification[type]({
@@ -134,6 +135,16 @@ const Layout = () => {
             >
               <HiDocumentReport />
               <span className="ml-2">Reports</span>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/librarian/suggestion-box"
+              className={`d-flex align-items-left justify-content-left`}
+              style={{ ...navStyle('/librarian/suggestion-box'), alignItems: 'center', paddingLeft: '7%' }}
+            >
+              <VscFeedback />
+              <span className="ml-2">Suggestion Box</span>
             </NavLink>
           </li>
         </ul>

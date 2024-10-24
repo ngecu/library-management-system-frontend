@@ -220,7 +220,7 @@ const transactionsWithFormattedData = transactions.map(transaction => ({
       </div>
       </div>
 
-      <div className="col-6">
+      {/* <div className="col-6">
       <div className="export-buttons">
         <Button className='metallic-button' onClick={() => generatePDF(transactions)} style={{ marginRight: 8 }}>
           <FaPrint /> Save PDF
@@ -229,7 +229,7 @@ const transactionsWithFormattedData = transactions.map(transaction => ({
           <IoCloudDownloadSharp /> Save CSV
         </Button>
       </div>
-        </div>
+        </div> */}
 
         </div>
       <div style={{ height: 400, width: '100%' }}>
