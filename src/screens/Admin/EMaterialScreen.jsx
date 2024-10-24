@@ -16,8 +16,66 @@ import {
 import { useFetchGenresQuery } from '../../features/genreApi';
 import { notification } from 'antd';
 import Barcode from 'react-barcode';
+import { InboxOutlined } from '@ant-design/icons';
+import { message, Upload } from 'antd';
+const { Dragger } = Upload;
 
-const AllBooks = () => {
+// Replace with your Cloudinary details
+const CLOUD_NAME = 'dqquyjsap';
+const UPLOAD_PRESET = 'f3gqwyzn';
+const CLOUDINARY_UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
+
+
+
+// Upload properties
+const props = {
+  name: 'file',
+  multiple: true,
+  // Remove the action, we'll handle the upload manually
+  customRequest({ file, onSuccess, onError }) {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', UPLOAD_PRESET); // Cloudinary upload preset
+
+    // Make the request to Cloudinary
+    fetch(CLOUDINARY_UPLOAD_URL, {
+      method: 'POST',
+      body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.secure_url) {
+        // File uploaded successfully, pass the URL to onSuccess
+        onSuccess(data, file);
+        message.success(`${file.name} uploaded successfully.`);
+        console.log('Uploaded file URL:', data.secure_url); // Use this URL to display or store
+      } else {
+        throw new Error('Upload failed');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      onError(error);
+      message.error(`${file.name} upload failed.`);
+    });
+  },
+  onChange(info) {
+    const { status } = info.file;
+    if (status !== 'uploading') {
+      console.log(info.file, info.fileList);
+    }
+    if (status === 'done') {
+      message.success(`${info.file.name} file uploaded successfully.`);
+    } else if (status === 'error') {
+      message.error(`${info.file.name} file upload failed.`);
+    }
+  },
+  onDrop(e) {
+    console.log('Dropped files', e.dataTransfer.files);
+  },
+};
+
+const EMaterialScreen = () => {
   const [show, setShow] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
@@ -260,6 +318,7 @@ const columns = [
       <h3>{selectedBook?.title}</h3>
       <p><strong>Author:</strong> {selectedBook?.author}</p>
       <p><strong>ISBN:</strong> {selectedBook?.isbn}</p>
+      <p><strong>LLC:</strong> {selectedBook?.llc?.name}</p>
       <p><strong>Total Copies:</strong> {selectedBook?.totalCopies}</p>
       <p><strong>Available:</strong> {selectedBook?.isAvailable ? 'Yes' : 'No'}</p>
       <p><strong>Call Number:</strong> {selectedBook?.callNumber}</p>
@@ -373,7 +432,7 @@ const columns = [
             <div className="bg-light">
       <div className="row py-2 px-2">
   <div className="col-8">
-    <h3>Books</h3>
+    <h3>E-Materials</h3>
   </div>
   <div className="col-4 d-flex align-items-center justify-content-end">
     <Form.Group className="mb-3 w-100" controlId="exampleForm.ControlInput1">
@@ -406,24 +465,10 @@ const columns = [
 
 </div>
 
-    {filteredBooks && 
-        <DataGrid
-          style={{ background: 'white' }}
-          rows={filteredBooks}
-          getRowId={(row) => row._id} 
-          columns={columns}
-          pageSize={5}
-          rowsPerPageOptions={[5, 10]}
-          disableSelectionOnClick
-          sx={{
-            '& .MuiDataGrid-columnHeaders': {
-              backgroundColor: 'blue',
-              color: 'BLUE',
-              fontWeight: 'bold',
-            },
-          }}
-        />
-      }
+<dotlottie-player src="https://lottie.host/8fede7df-15f7-4ee3-b626-3f97e2a692d5/PYDGylFu86.json" background="transparent" speed="1" style={{width: "100%",height: "300px"}} loop autoplay></dotlottie-player>
+
+
+
       </div>
       )}
       
@@ -432,79 +477,21 @@ const columns = [
       {/* Ant Design Modal for Adding a New Book */}
       <Spin spinning={isAddingBook}>
       <Modal
-        title="Add New Book"
+        title="Upload Material Here"
         visible={show}
         onCancel={handleClose}
         footer={null}
       >
-        <Form onSubmit={handleSubmit}>
-          <Form.Group controlId="title">
-            <Form.Label>Title</Form.Label>
-            <Form.Control
-              type="text"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
-
-          <Form.Group controlId="author">
-            <Form.Label>Author</Form.Label>
-            <Form.Control
-              type="text"
-              name="author"
-              value={formData.author}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
-
-          <Form.Group controlId="isbn">
-            <Form.Label>ISBN</Form.Label>
-            <Form.Control
-              type="text"
-              name="isbn"
-              value={formData.isbn}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
-
-          <Form.Group controlId="genre">
-        <Form.Label>LLC</Form.Label>
-        <Form.Control
-          as="select"
-          name="llc"
-          value={formData.llc} // Ensure formData.genre is a string or the ID of the selected genre
-          onChange={handleChange}
-          required
-        >
-          <option value="">Select LCC Classification</option>
-          {!isLoadingGenres && genres.map((genre) => (
-            <option key={genre._id} value={genre._id}>{genre.name}</option>
-          ))}
-        </Form.Control>
-      </Form.Group>
-
-    
-
-          <Form.Group controlId="totalCopies">
-            <Form.Label>Total Copies</Form.Label>
-            <Form.Control
-              type="number"
-              name="totalCopies"
-              value={formData.totalCopies}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
-
-
-          <Button variant="primary" type="submit" style={{ marginTop: '10px' }}>
-            Submit
-          </Button>
-        </Form>
+    <Dragger {...props}>
+    <p className="ant-upload-drag-icon">
+      <InboxOutlined />
+    </p>
+    <p className="ant-upload-text">Click or drag file to this area to upload</p>
+    <p className="ant-upload-hint">
+      Support for a single or bulk upload. Strictly prohibited from uploading company data or other
+      banned files.
+    </p>
+  </Dragger>
       </Modal>
       </Spin>
 
@@ -595,4 +582,4 @@ const BarcodePrint = ({ bookCopies }) => {
 };
 
 
-export default AllBooks;
+export default EMaterialScreen;
