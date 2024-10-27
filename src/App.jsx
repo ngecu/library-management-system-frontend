@@ -23,6 +23,7 @@ import Profile from './screens/Admin/Profile';
 import Suggestion from './screens/Patron/Suggestion';
 import AdminSuggestionBox from './screens/Admin/AdminSuggestionBox';
 import EMaterialScreen from './screens/Admin/EMaterialScreen';
+import SystemSettings from './screens/Admin/SysteSettings';
 
 const App = () => {
 
@@ -50,7 +51,9 @@ const App = () => {
               <Route path="profile" element={<Profile />} />
               <Route path="suggestion-box" element={<AdminSuggestionBox />} />
               <Route path="e-materials" element={<EMaterialScreen />} />
-
+              <Route path="system-settings" element={<SystemSettings />} />
+              
+              
               
               
             </Route>

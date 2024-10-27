@@ -11,7 +11,7 @@ import { BsEmojiAngryFill } from 'react-icons/bs';
 import { HiDocumentReport } from 'react-icons/hi';
 import home from "../../assets/home.jpeg"
 import { VscFeedback } from "react-icons/vsc";
-
+import { GrSettingsOption } from "react-icons/gr";
 const openNotification = (type, message, description) => {
   notification[type]({
     message,
@@ -155,6 +155,16 @@ const Layout = () => {
             >
               <VscFeedback />
               <span className="ml-2">Suggestion Box</span>
+            </NavLink>
+          </li>
+          <li>
+            <NavLink
+              to="/librarian/system-settings"
+              className={`d-flex align-items-left justify-content-left`}
+              style={{ ...navStyle('/librarian/system-settings'), alignItems: 'center', paddingLeft: '7%' }}
+            >
+             <GrSettingsOption />
+              <span className="ml-2">System Settings</span>
             </NavLink>
           </li>
         </ul>

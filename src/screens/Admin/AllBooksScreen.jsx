@@ -103,6 +103,7 @@ const handleEdit = (book) => {
   setSelectedBook(book);
   setFormData({
     title: book.title,
+    subtitle: book.subtitle,
     author: book.author,
     isbn: book.isbn,
     llc: book.llc,
@@ -444,6 +445,16 @@ const columns = [
               type="text"
               name="title"
               value={formData.title}
+              onChange={handleChange}
+              required
+            />
+          </Form.Group>
+          <Form.Group controlId="subtitle">
+            <Form.Label>Sub Title</Form.Label>
+            <Form.Control
+              type="text"
+              name="subtitle"
+              value={formData.subtitle}
               onChange={handleChange}
               required
             />

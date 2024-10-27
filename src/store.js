@@ -6,6 +6,9 @@ import { booksApi } from './features/booksApi';
 import { transactionApi } from './features/transactionApi';
 import { genreApi } from './features/genreApi';
 import { suggestionApi } from './features/suggestionApi';
+import { requestsApi } from './features/requestApi';
+import { systemSettingsApi } from './features/systemSettingsApi';
+import { exportApi } from './features/exportApi';
 
 
 export const store = configureStore({
@@ -16,7 +19,9 @@ export const store = configureStore({
     [transactionApi.reducerPath]: transactionApi.reducer,
     [genreApi.reducerPath]: genreApi.reducer,
     [suggestionApi.reducerPath]: suggestionApi.reducer,
-
+    [requestsApi.reducerPath]: requestsApi.reducer,
+    [systemSettingsApi.reducerPath]: systemSettingsApi.reducer,
+    [exportApi.reducerPath]: exportApi.reducer,
     
   },
   middleware: (getDefaultMiddleware) =>
@@ -27,6 +32,9 @@ export const store = configureStore({
       transactionApi.middleware,
       genreApi.middleware,
       suggestionApi.middleware,
+      requestsApi.middleware,
+      systemSettingsApi.middleware,
+      exportApi.middleware,
 
     ),
 });

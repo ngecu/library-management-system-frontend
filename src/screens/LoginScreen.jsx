@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Button, Row, Col, Container } from 'react-bootstrap';
 import { useLoginMutation } from '../features/userApi'; // Adjust the import path as necessary
@@ -49,6 +49,19 @@ const LoginScreen = ({ location, history }) => {
       openNotification('error', 'Login Failed', err.data.message || 'Login failed, please try again.');
     }
   };
+
+    // Check localStorage for existing login and redirect if found
+    useEffect(() => {
+      const existingLogin = localStorage.getItem("login");
+      if (existingLogin) {
+        const parsedLogin = JSON.parse(existingLogin);
+        if (parsedLogin.role === "patron") {
+          navigate("/patron");
+        } else {
+          navigate("/librarian");
+        }
+      }
+    }, [navigate]);
 
   return (
     <>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate,Link } from 'react-router-dom';
 import { Button, Container, Nav, Navbar, NavDropdown } from 'react-bootstrap';
 import { FaHome, FaRegUserCircle } from 'react-icons/fa';
@@ -18,11 +18,19 @@ const PatronLayout = () => {
   const { pathname } = location;
   const userDetails = JSON.parse(localStorage.getItem('login'))
   const navigate = useNavigate()
+
   const handleLogout = () => {
     localStorage.removeItem('login');
     openNotification('success', 'Logout Successful', 'You have been logged out.');
     navigate("/");
   };
+
+      // Check localStorage for existing login and redirect if found
+      useEffect(() => {
+        if (!userDetails) {
+            navigate("/");
+        }
+      }, [navigate]);
 
   const handleMenuToggle = (e) => {
     e.preventDefault();
@@ -62,7 +70,7 @@ const PatronLayout = () => {
                 }}
               >
                 <div style={{cursor:"pointer"}} className="d-flex align-items-center">
-                  <span className="me-2">{userDetails.name}</span>
+                  <span className="me-2">{userDetails?.name}</span>
                   <FaRegUserCircle />
                 </div>
               </Dropdown>
