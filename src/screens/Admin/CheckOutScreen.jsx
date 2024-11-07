@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, message, Select, Spin, Steps, Result } from 'antd';
+import { Form, Input, Button, message, Select, Spin, Steps, Result, notification } from 'antd';
 import { useBorrowBookMutation, useFetchTransactionsByUserQuery } from '../../features/transactionApi';
 import { useFetchBookCopiesQuery, useFetchBooksQuery } from '../../features/booksApi';
 import { useFetchUsersQuery } from '../../features/userApi';
@@ -59,6 +59,15 @@ const CheckoutScreen = () => {
     }
   }, [current]);
 
+  const openNotification = (type, message, description) => {
+    notification[type]({
+      message,
+      description,
+      placement: 'topRight', // Positioning the notification at the top right
+      duration: 3, // Duration to display the notification
+    });
+  };
+
   // Handle book selection
   const handleBookSelect = (bookId) => {
     const selected = books.find(book => book.id === bookId);
@@ -117,11 +126,10 @@ useEffect(() => {
   
     const selectedCopy = books.find(copy => copy._id === decodedText && copy.isAvailable);
     if (selectedCopy) {
-      console.log("selectedCopy ",selectedCopy);
       
       setSelectedBook(selectedCopy);
     } else {
-      message.error("Invalid or unavailable book copy.");
+      openNotification('error', 'Error', "Invalid or unavailable book copy.");
     }
   };
   
@@ -140,11 +148,10 @@ useEffect(() => {
         const fineAmountExceeded = userTransactions?.some(transaction => transaction.fineAmount > 0);
         const allBooksReturned = userTransactions?.every(transaction => transaction.isReturned);
   
-        console.log(userTransactions,allBooksReturned);
         
         const hasNoTransactions = !userTransactions?.length;
   
-        return hasNoTransactions || fineAmountExceeded || allBooksReturned;
+        return hasNoTransactions || !fineAmountExceeded || allBooksReturned;
       }
    
     } else if (current === 1) {
@@ -158,14 +165,18 @@ useEffect(() => {
     const { bookCopyId, userId } = values;
 
     try {
+      openNotification('info', 'Loading...', 'Please wait while we process your request.');
+
       const result = await borrowBook({ bookCopyId, userId }).unwrap();
-      message.success(result.message);
+      openNotification('success', 'Success', result.message);
       form.resetFields();
       setAvailableCopies([]);
       setSelectedBook(null);
       navigate("/librarian/transactions");
     } catch (error) {
-      message.error(error.message || 'Failed to borrow the book');
+      console.log("error is ",error);
+      
+      openNotification('error', 'Error', error?.data?.message);
     }
   };
 
@@ -213,9 +224,9 @@ useEffect(() => {
 
     <div>
       <div id="reader" width="600px"></div>
-      {code && !books.some(copy => copy._id === code && copy.isAvailable) && (
+      {/* {code && !books.some(copy => copy._id === code && copy.isAvailable) && (
         <p style={{ color: 'red' }}>Invalid barcode. Please try again.</p>
-      )}
+      )} */}
     </div>,
 
     <div>
@@ -240,10 +251,7 @@ useEffect(() => {
         {users &&  users.find(user => user._id === selectedUser)?.email}
 
         </p>
-        <p><span class="highlight">Student ID -</span>
-        {users &&  users.find(user => user._id === selectedUser)?.studentID}
 
-        </p>
  
       </div>
     </div>

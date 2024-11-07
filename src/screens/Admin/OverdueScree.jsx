@@ -142,22 +142,7 @@ const transactionsWithFormattedData = transactions.map(transaction => ({
     { field: 'borrowedAt', headerName: 'Borrow Date', width: 200, valueFormatter: ({ value }) => new Date(value).toLocaleDateString() },
     { field: 'dueDate', headerName: 'Return Date', width: 200, valueFormatter: ({ value }) => new Date(value).toLocaleDateString() },
     { field: 'fineAmount', headerName: 'Fine Amount', width: 150 },
-    {
-      field: 'actions',
-      headerName: 'Actions',
-      width: 200,
-      sortable: false,
-      renderCell: (params) => (
-        <>
-          <Button variant="info" size="small" onClick={() => handleView(params.row)} style={{ marginRight: 8 }}>
-            <FaEye />
-          </Button>
-          <Button variant="danger" size="small" onClick={() => confirmDelete(params.row.transactionId)}>
-            <FaTrashAlt />
-          </Button>
-        </>
-      ),
-    },
+
   ];
 
   return (

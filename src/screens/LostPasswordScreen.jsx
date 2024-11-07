@@ -1,4 +1,4 @@
-import { Form, Input, message } from 'antd';
+import { Form, Input, message, Spin } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { useRequestPasswordResetMutation, useResetPasswordMutation } from '../features/userApi';  // Make sure to import the correct API hook
 
@@ -52,14 +52,16 @@ const LostPasswordScreen = () => {
     <Container
       style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: "100vh" }}
     >
+      <Spin spinning={isLoading}>
       <div
-        style={{
-          boxShadow: 'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px',
-          padding: '20px',
-          width: '800px',
-          background: "#294A70",
-          borderRadius: "20px"
-        }}
+       style={{
+        boxShadow: 'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px',
+        padding: '20px',
+        width: '100%',
+        maxWidth: '800px',
+        background: "#294A70",
+        borderRadius: "20px",
+      }}
         className='card'
       >
         <Row>
@@ -140,16 +142,17 @@ const LostPasswordScreen = () => {
             </div>
           </Col>
 
-          <Col md={6} style={{ display: "flex", justifyContent: "center" }}>
-            <img
-              style={{ position: "relative", right: "4%", borderRadius: "40px" }}
-              src={home}
-              alt=""
-              className="w-100"
-            />
-          </Col>
+          <Col md={6} className="d-none d-md-flex" style={{ justifyContent: "center" }}>
+              <img
+                style={{ position: "relative", right: "4%", borderRadius: "40px" }}
+                src={home}
+                alt=""
+                className='w-100'
+              />
+            </Col>
         </Row>
       </div>
+      </Spin>
     </Container>
   );
 };

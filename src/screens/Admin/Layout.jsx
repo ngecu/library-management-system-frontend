@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Container, Navbar } from 'react-bootstrap';
 import { FaHome, FaRegUserCircle } from 'react-icons/fa';
@@ -46,6 +46,15 @@ const Layout = () => {
   };
   const userDetails = JSON.parse(localStorage.getItem('login'))
 
+  useEffect(() => {
+    console.log("userDetails ",userDetails);
+    
+    // Check if userDetails is null and redirect to home
+    if (!userDetails) {
+      navigate("/");
+    }
+  }, [userDetails, navigate]);
+
   return (
     <div id="wrapper">
       <div id="sidebar-wrapper">
@@ -77,7 +86,7 @@ const Layout = () => {
               <span className="ml-2">Books</span>
             </NavLink>
           </li>
-          <li>
+          {/* <li>
             <NavLink
               to="/librarian/e-materials"
               className={`d-flex align-items-left justify-content-left`}
@@ -86,7 +95,7 @@ const Layout = () => {
               <GiBookshelf />
               <span className="ml-2">E-Materials</span>
             </NavLink>
-          </li>
+          </li> */}
           <li>
             <NavLink
               to="/librarian/checkout"
@@ -188,7 +197,7 @@ const Layout = () => {
     }}
   >
     <div style={{cursor:"pointer"}} className="d-flex align-items-center">
-      <span className="me-2">{userDetails.name}</span>
+      <span className="me-2">{userDetails?.name}</span>
       <FaRegUserCircle />
     </div>
   </Dropdown>

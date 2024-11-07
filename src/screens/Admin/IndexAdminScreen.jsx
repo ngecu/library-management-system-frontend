@@ -32,13 +32,16 @@ const IndexAdminScreen = () => {
   const [isPatron, setIsPatron] = useState(false);
   const [register, { isLoading:isRegistering, isError, isSuccess }] = useRegisterMutation();
 
+  
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
       console.log('Form Values:', values);
+      openNotification('info', 'Loading...', 'Please wait while we process your request.');
 
       // Call the register mutation with the form values
       const response = await register(values).unwrap();
+      openNotification('success', 'Success', 'User registered successfully!');
 
       // Handle success
       console.log('User registered successfully:', response);
@@ -46,10 +49,13 @@ const IndexAdminScreen = () => {
       handleCancel(); // Call to close the modal or form
     } catch (errorInfo) {
       console.log('Validation Failed:', errorInfo);
+      openNotification('error', 'Error', errorInfo.data?.message || 'Something went wrong!');
 
       // Handle mutation error
       if (isError) {
         console.error('Registration failed:', errorInfo);
+        openNotification('error', 'Error', errorInfo.data?.message || 'Something went wrong!');
+
         // You might want to show an error message to the user
       }
     }
@@ -376,9 +382,7 @@ const openNotification = (type, message, description) => {
           </Form.Item>
         )}
 
-    <Form.Item name="isActive" valuePropName="checked">
-      <Checkbox>Is Active</Checkbox>
-    </Form.Item>
+
 
 
   </Form>

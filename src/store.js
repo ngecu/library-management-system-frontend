@@ -9,6 +9,8 @@ import { suggestionApi } from './features/suggestionApi';
 import { requestsApi } from './features/requestApi';
 import { systemSettingsApi } from './features/systemSettingsApi';
 import { exportApi } from './features/exportApi';
+import { llcApi } from './features/llcApi';
+
 
 
 export const store = configureStore({
@@ -22,6 +24,7 @@ export const store = configureStore({
     [requestsApi.reducerPath]: requestsApi.reducer,
     [systemSettingsApi.reducerPath]: systemSettingsApi.reducer,
     [exportApi.reducerPath]: exportApi.reducer,
+    [llcApi.reducerPath]: llcApi.reducer,
     
   },
   middleware: (getDefaultMiddleware) =>
@@ -35,6 +38,7 @@ export const store = configureStore({
       requestsApi.middleware,
       systemSettingsApi.middleware,
       exportApi.middleware,
+      llcApi.middleware,
 
     ),
 });

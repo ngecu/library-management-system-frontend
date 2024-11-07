@@ -155,10 +155,10 @@ export const userApi = createApi({
 
     // Reset password with token (PUT)
     resetPassword: builder.mutation({
-      query: ({  email }) => ({
+      query: ({  token,newPassword }) => ({
         url: `/reset-password`,
         method: 'PUT',
-        body: { email },
+        body: { token,newPassword },
       }),
     }),
   }),

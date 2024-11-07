@@ -4,7 +4,7 @@ import { FaEye, FaEdit, FaTrashAlt, FaPrint, FaSearch } from 'react-icons/fa';
 import { DataGrid } from '@mui/x-data-grid';
 import { IoIosAddCircle } from "react-icons/io";
 import { IoCloudDownloadSharp } from "react-icons/io5";
-import { Drawer, Modal, Spin } from 'antd';
+import { Drawer, Input, Modal, Popconfirm, Space, Spin, Table, Tabs, Tag } from 'antd';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable'; // Ensure you import jsPDF's AutoTable plugin
 import { 
@@ -16,9 +16,13 @@ import {
 import { useFetchGenresQuery } from '../../features/genreApi';
 import { notification } from 'antd';
 import Barcode from 'react-barcode';
+import { useBookBookMutation, useFetchTransactionsByUserQuery } from '../../features/transactionApi';
+import { EyeOutlined, DeleteOutlined } from '@ant-design/icons';
+import { useAddLLCMutation, useDeleteLLCMutation, useFetchLLCsQuery } from '../../features/llcApi';
 
 const AllBooks = () => {
   const [show, setShow] = useState(false);
+  const [showAddCategoryModal, setShowAddCategoryModal] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     author: '',
@@ -30,28 +34,42 @@ const AllBooks = () => {
   });
   const [selectedBook, setSelectedBook] = useState(null); // Store selected book for editing and viewing
   const [deleteBookId, setDeleteBookId] = useState(null); // Store book ID for deletion
+  const [deleteCategoryId, setDeleteCategoryId] = useState(null); // Store book ID for deletion
   const [showEditDrawer, setShowEditDrawer] = useState(false);
   const [showDetailDrawer, setShowDetailDrawer] = useState(false);
   const [bookCopies, setBookCopies] = useState([]);
   const [showPrintBarcodes, setShowPrintBarcodes] = useState(false);
+  const [showBarcodes, setBarcodes] = useState(false);
+  const [categoryData, setCategoryData] = useState({
+    name: ''
+  });
+  const [showAddCategoryDrawer, setShowAddCategoryDrawer] = useState(false);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+  const userDetails = JSON.parse(localStorage.getItem('login'))
 
   
   
 const { data: books = [], isLoading } = useFetchBooksQuery();
+const { data: categories = [] } = useFetchLLCsQuery();
+const { data: transactions = [], isLoadingMyTransactions } = useFetchTransactionsByUserQuery(userDetails._id);
+
 const { data: genres = [], isLoading: isLoadingGenres } = useFetchGenresQuery();
 // Mutations
-const [addBook, { isLoading: isAddingBook, isSuccess, isError }] = useAddBookMutation(); // renamed to isAddingBook
+const [addBook, { isLoading: isAddingBook, isSuccess, isError }] = useAddBookMutation(); 
+const [addLLC, { isLoading: isAddingLLC }] = useAddLLCMutation(); // renamed to isAddingBook
+
+// renamed to isAddingBook
 const [updateBook] = useUpdateBookMutation();
 const [deleteBook] = useDeleteBookMutation();
+const [deleteLLC] = useDeleteLLCMutation();
 
 const loginData = JSON.parse(localStorage.getItem('login'));
 
 // Check if the user is an admin
 const isAdmin = loginData?.isAdmin; // Optional chaining to prevent errors if loginData is null
-
+const isPatron = loginData.role == "patron"
 const openNotification = (type, message, description) => {
   notification[type]({
     message: message,
@@ -67,6 +85,8 @@ const handleChange = (e) => {
     [name]: type === 'checkbox' ? checked : value,
   });
 };
+
+
 
 const handleSubmit = async (e) => {
   e.preventDefault();
@@ -116,6 +136,25 @@ const handleEdit = (book) => {
   setShowEditDrawer(true); // Show edit drawer
 };
 
+
+  // Handlers for drawer visibility
+  const handleAddCategoryShow = () => setShowAddCategoryDrawer(true);
+  const handleAddCategoryClose = () => {
+    setShowAddCategoryDrawer(false);
+    setCategoryData({ name: '' });
+  };
+
+  const handleCategoryChange = (e) => {
+    setCategoryData({ ...categoryData, [e.target.name]: e.target.value });
+  };
+
+  const handleCategorySubmit = async (e) => {
+    e.preventDefault();
+    const {data} = await addLLC(categoryData)
+    console.log("category data is ",data);
+
+  };
+
 const handleView = (book) => {
   setSelectedBook(book);
   setShowDetailDrawer(true); // Show detail drawer
@@ -131,44 +170,6 @@ const handleDelete = async () => {
 const confirmDelete = (bookId) => {
   setDeleteBookId(bookId); // Set the book ID for confirmation
 };
-
-
-
-const columns = [
-  { field: 'title', headerName: 'Title', width: 200 },
-  { field: 'author', headerName: 'Author', width: 200 },
-  { field: 'llc', headerName: 'LLC Classification', width: 200 }, // This will now display llc.name
-  {
-    field: 'actions',
-    headerName: 'Actions',
-    width: 200,
-    sortable: false,
-    renderCell: (params) => (   
-      <>
-        <Button
-          variant="contained"
-          color="info"
-          size="small"
-          onClick={() => handleView(params.row)}
-          style={{ marginRight: 8 }}
-          disabled={!isAdmin}
-        >
-          <FaEye />
-        </Button>
-    
-        <Button
-          variant="contained"
-          color="error"
-          size="small"
-          onClick={() => confirmDelete(params.row._id)}
-          disabled={!isAdmin}
-        >
-          <FaTrashAlt color="red" />
-        </Button>
-      </>
-    ),
-  },
-];
 
 
   const generatePDF = (books) => {
@@ -339,16 +340,146 @@ const columns = [
    // State to keep track of search input
    const [searchQuery, setSearchQuery] = useState('');
    // State to store filtered books
+
+
    const booksWithId = books.map(book => ({
     ...book,
-    id: book._id,
+    key: book._id, // Ant Design Table requires `key` instead of `id`
     llc: book.llc ? book.llc.name : '', // Extract the name from the llc object
-  })); 
-
+    remainingCopies: book.remainingCopies || 0,
+    availability: book.remainingCopies > 0,
+    waitingCount: book.waitingList?.length || 0,
+    inQueue: isPatron && book.waitingList?.includes(loginData.userId),
+  }));
   
-   
-   const [filteredBooks, setFilteredBooks] = useState(booksWithId);
- 
+  const hasBorrowedBook = (bookId) => {
+    return transactions.some(transaction => 
+      transaction.bookId === bookId && !transaction.returned
+    );
+  };
+  const columns = [
+    {
+      title: 'Title',
+      dataIndex: 'title',
+      key: 'title',
+      width: 200,
+    },
+    {
+      title: 'Author',
+      dataIndex: 'author',
+      key: 'author',
+      width: 200,
+    },
+    {
+      title: 'LLC Classification',
+      dataIndex: 'llc',
+      key: 'llc',
+      width: 200,
+    },
+    {
+      title: 'Remaining Copies',
+      dataIndex: 'remainingCopies',
+      key: 'remainingCopies',
+      align: 'center',
+      width: 150,
+    },
+    {
+      title: 'Availability',
+      dataIndex: 'availability',
+      key: 'availability',
+      align: 'center',
+      width: 150,
+      render: (availability) => (
+        <Tag color={availability ? 'green' : 'red'}>
+          {availability ? 'Available' : 'Unavailable'}
+        </Tag>
+      ),
+    },
+    {
+      title: 'People Waiting',
+      dataIndex: 'waitingCount',
+      key: 'waitingCount',
+      align: 'center',
+      width: 150,
+    },
+  // Conditionally add "In Waiting Queue" column if isPatron is true
+  ...(isPatron ? [{
+    title: 'In Waiting Queue',
+    dataIndex: 'inQueue',
+    key: 'inQueue',
+    align: 'center',
+    width: 180,
+    render: (inQueue) => (
+      <Tag color={inQueue ? 'orange' : 'grey'}>
+        {inQueue ? 'In Queue' : 'Not in Queue'}
+      </Tag>
+    ),
+  }] : []),
+    {
+      title: 'Actions',
+      key: 'actions',
+      width: 200,
+      align: 'center',
+      render: (_, record) => (
+        <>
+          {!isPatron && (
+            <>
+           
+                <EyeOutlined
+                    onClick={() => handleView(record)}
+                    disabled={!isAdmin}
+                    style={{ marginRight: 8 }}
+                />
+               
+
+           
+                <DeleteOutlined disabled={!isAdmin}  onClick={() => confirmDelete(record._id)} style={{ color: 'red', cursor: 'pointer' }} />
+               
+            </>
+          )}
+          {isPatron && !record.availability && !record.inQueue && (
+            <Button
+              type="primary"
+              onClick={() => handleRequestBook(record._id)}
+              style={{ marginLeft: 8 }}
+            >
+              Book this book
+            </Button>
+          )}
+        </>
+      ),
+    },
+  ];
+  
+
+  const Categorycolumns = [
+    {
+      title: 'Name',
+      dataIndex: 'name',
+      key: 'name',
+    },
+    {
+      title: 'Action',
+      key: 'action',
+      render: (text, record) => (
+        <Space size="middle">
+          <Popconfirm
+            title="Are you sure to delete this category?.This will delete all books in this category"
+            onConfirm={() => handleDeleteCategory(record._id)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <DeleteOutlined style={{ color: 'red', cursor: 'pointer' }} />
+          </Popconfirm>
+        </Space>
+      ),
+    },
+  ];
+
+
+// State to store filtered books
+const [filteredBooks, setFilteredBooks] = useState(booksWithId);
+
    // Effect to filter books when searchQuery changes
    useEffect(() => {
      if (searchQuery.trim() === '') {
@@ -363,6 +494,26 @@ const columns = [
      }
    }, [searchQuery, books]);
  
+   const [bookBook] = useBookBookMutation();
+
+   const handleDeleteCategory = async (c_Id) => {
+    if(c_Id){
+      await deleteLLC(c_Id)
+    setDeleteCategoryId(null); // Clear the delete category ID
+
+    }
+    
+  };
+
+  const handleRequestBook = async (bookId) => {
+    try {
+      await bookBook({ bookId,userId:loginData._id }); // Call the bookBook mutation with the book ID
+      openNotification('success', 'Request Successful', 'You have successfully requested the book.');
+    } catch (error) {
+      console.error('Error requesting book:', error);
+      openNotification('error', 'Request Failed', error.response?.data?.message || 'Could not request book.');
+    }
+  };
 
   return (
     <div className="container-fluid">
@@ -398,8 +549,30 @@ const columns = [
           <IoIosAddCircle color="white" /> Add New
         </Button>
       )}
-            <Button className='metallic-button' onClick={() => generatePDF(filteredBooks)}> <FaPrint /> Save PDF</Button>
-      <Button className='metallic-button' onClick={() => generateCSV(filteredBooks)}>  <IoCloudDownloadSharp /> Save CSV</Button>
+         <Button 
+  className='metallic-button' 
+  onClick={() => generatePDF(filteredBooks)} 
+  disabled={filteredBooks.length === 0} // Disable if filteredBooks is empty
+>
+  <FaPrint /> Save PDF
+</Button>
+
+{isAdmin && (
+  <Button 
+    className='metallic-button' 
+    onClick={() => setBarcodes(!showBarcodes)} 
+    disabled={filteredBooks.length === 0} // Disable if filteredBooks is empty
+  >
+    <IoCloudDownloadSharp /> {!showBarcodes ? <> Bar Codes </> : <> Books </>}
+  </Button>
+
+  
+)}
+  {isAdmin && (
+        <Button style={{ background: '#294A70', color: 'white' }} onClick={handleAddCategoryShow}>
+          <IoIosAddCircle color="white" />LLC Category
+        </Button>
+      )}
 
     </ButtonGroup>
 
@@ -407,24 +580,71 @@ const columns = [
 
 </div>
 
-    {filteredBooks && 
-        <DataGrid
-          style={{ background: 'white' }}
-          rows={filteredBooks}
-          getRowId={(row) => row._id} 
-          columns={columns}
-          pageSize={5}
-          rowsPerPageOptions={[5, 10]}
-          disableSelectionOnClick
-          sx={{
-            '& .MuiDataGrid-columnHeaders': {
-              backgroundColor: 'blue',
-              color: 'BLUE',
-              fontWeight: 'bold',
-            },
-          }}
-        />
-      }
+ 
+{filteredBooks && 
+
+<>
+{showBarcodes ? 
+
+
+<Tabs
+  defaultActiveKey="1"
+  tabPosition="left"
+  style={{
+    maxHeight: 400,
+  }}
+  items={filteredBooks.map((book, index) => ({
+    label: book.title,      // Use book title as the tab label
+    key: String(book.id),    // Use unique book ID as the key
+    children: (
+      <div style={{
+        maxHeight: 400,
+      }}>
+        <h3>{book.title}</h3>
+        <p>{book.description}</p> {/* Add other book details as needed */}
+        
+        {/* Map each book copy */}
+        <div >
+         
+         <Row style={{
+        maxHeight: 339,
+        overflow:"scroll"
+      }}>
+            {book.bookCopies.map((copy, idx) => (
+              <Col key={idx}>
+                <div>
+                  <Barcode value={copy._id} displayValue={false} /> {/* Barcode without value display */}
+                </div>
+              </Col>
+            ))}
+          </Row>
+        </div>
+      </div>
+    ),
+  }))}
+/>
+
+
+
+//   <Row>
+//   {filteredBooks.map((book) => (
+//     <Col key={book.id}> {/* Add a unique key for each item */}
+//       {book.title} {/* Replace with appropriate book details */}
+//     </Col>
+//   ))}
+// </Row>
+
+:
+<Table
+columns={columns}
+dataSource={filteredBooks}
+pagination={{ pageSize: 5, showSizeChanger: true, pageSizeOptions: ['5', '10'] }}
+rowKey="key"
+style={{ background: 'white' }}
+/>
+}
+  </>
+}
       </div>
       )}
       
@@ -518,6 +738,43 @@ const columns = [
         </Form>
       </Modal>
       </Spin>
+
+
+
+      {/* Drawer for adding category */}
+      <Drawer
+        title="Add LLC Category"
+        visible={showAddCategoryDrawer}
+        onClose={handleAddCategoryClose}
+        width={400} // Adjust drawer width as needed
+      >
+        <Spin spinning={isAddingLLC}>
+          <Form layout="vertical" onSubmit={handleCategorySubmit}>
+          <Form.Group controlId="title">
+            <Form.Label>Name</Form.Label>
+            <Form.Control
+              type="text"
+              name="name"
+              value={categoryData.name}
+              onChange={handleCategoryChange}
+              required
+            />
+          </Form.Group>
+            <Button type="primary" htmlType="submit" style={{ marginTop: '10px' }}>
+              Submit
+            </Button>
+          </Form>
+        </Spin>
+
+
+      <Table
+        columns={Categorycolumns}
+        dataSource={categories}
+        pagination={false} // Turn off pagination if not needed
+        style={{ marginTop: '20px' }}
+      />
+
+      </Drawer>
 
       <Modal
         title="Confirm Delete"

@@ -93,6 +93,79 @@ export const transactionApi = createApi({
       }),
       invalidatesTags: ['transactions'],
     }),
+
+      // Renew a book
+      renewBook: builder.mutation({
+        query: (transactionId) => ({
+          url: `/${transactionId}/renew`,
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }),
+        invalidatesTags: ['transactions'],
+      }),
+  
+      // Update fine for an overdue book
+      updateFineAmount: builder.mutation({
+        query: (transactionId) => ({
+          url: `/${transactionId}/fine`,
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }),
+        invalidatesTags: ['transactions'],
+      }),
+  
+      // Add a user to the waiting list for a book
+      addUserToWaitingList: builder.mutation({
+        query: ({ bookId, userId }) => ({
+          url: `/book`,
+          method: 'POST',
+          body: { bookId, userId },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }),
+        invalidatesTags: ['transactions'],
+      }),
+  
+      // Get the waiting list for a specific book
+      fetchWaitingList: builder.query({
+        query: (bookId) => ({
+          url: `/books/${bookId}/waiting-list`,
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }),
+        providesTags: ['transactions'],
+      }),
+      
+      fetchUserQueuePosition: builder.query({
+        query: ({ bookId, userId }) => ({
+          url: `/books/${bookId}/user/${userId}/position`,
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }),
+        providesTags: ['transactions'],
+      }),
+
+      bookBook: builder.mutation({
+        query: (data) => ({
+          url: `/book`,
+          method: 'POST',
+          body: data,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }),
+        invalidatesTags: ['transactions'],
+      }),
+
   }),
 });
 
@@ -100,10 +173,14 @@ export const transactionApi = createApi({
 export const {
   useFetchTransactionsQuery,
   useFetchTransactionByIdQuery,
-  useFetchTransactionsByUserQuery, // Hook for fetching transactions by user
+  useFetchOverdueQuery,
+  useFetchTransactionsByUserQuery,
   useBorrowBookMutation,
   useReturnBookMutation,
   useRenewBookMutation,
-  useFetchOverdueQuery
-  
+  useUpdateFineAmountMutation,
+  useAddUserToWaitingListMutation,
+  useFetchWaitingListQuery,
+  useFetchUserQueuePositionQuery,
+  useBookBookMutation
 } = transactionApi;

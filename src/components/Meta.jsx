@@ -14,9 +14,9 @@ const Meta = ({ title, description, keywords }) => {
 }
 
 Meta.defaultProps = {
-  title: 'DrinksAndChill',
-  description: 'We sell the best alcoholic products for cheap',
-  keywords: 'drinsandchill,drinks and chill,drink&chill,drink,chill,drink muranga,drink chill muranga,drinkandchill,alcohol, murang"a wines and spirit, muranga drink and chill,beer,wines and spirit',
+  title: 'AMTI Library System',
+  description: '',
+  keywords: 'amti,amti lib',
 }
 
 export default Meta

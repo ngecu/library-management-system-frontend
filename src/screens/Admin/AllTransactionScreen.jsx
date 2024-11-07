@@ -67,7 +67,7 @@ const transactionsWithFormattedData = transactions.map(transaction => ({
   returnDate: transaction.returnedAt 
     ? formatReadableDate(transaction.returnedAt) // Format returnDate if it exists
     : 'Not yet', 
-  fineAmount: transaction.fineAmount ? `$${transaction.fineAmount.toFixed(2)}` : 'No fine', // Format fine amount
+  fineAmount: transaction.fineAmount ? `Ksh.${transaction.fineAmount.toFixed(2)}` : 'No fine', // Format fine amount
 }));
 
   
@@ -183,19 +183,6 @@ const transactionsWithFormattedData = transactions.map(transaction => ({
     { field: 'dueDate', headerName: 'Due Date', width: 200 },
     { field: 'returnDate', headerName: 'Return Date', width: 200 },
     { field: 'fineAmount', headerName: 'Fine Amount', width: 150 },
-    {
-      field: 'actions',
-      headerName: 'Actions',
-      width: 200,
-      sortable: false,
-      renderCell: (params) => (
-        <>
-          <Button variant="info" size="small" onClick={() => console.log("update clicked")} style={{ marginRight: 8 }}>
-            Check Fine
-          </Button>
-        </>
-      ),
-    },
   ];
 
   return (

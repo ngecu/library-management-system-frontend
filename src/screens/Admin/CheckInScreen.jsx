@@ -150,8 +150,10 @@ useEffect(() => {
       if (!selectedUser || !userTransactions || error) return false;
   
       const hasActiveTransaction = userTransactions.some(transaction => !transaction.returned);
+      const fineAmountExceeded = userTransactions?.some(transaction => transaction.fineAmount > 0);
+      console.log("fineAmountExceeded ",hasActiveTransaction,fineAmountExceeded);
       
-      return hasActiveTransaction;
+      return hasActiveTransaction && !fineAmountExceeded;
     }
      else if (current === 1) {
       if (!code || !books.some(copy => copy._id === code && !copy.isAvailable)) return false;
@@ -236,9 +238,7 @@ useEffect(() => {
                         <p><span className="highlight">Email - </span>
                           {users && users.find(user => user._id === selectedUser)?.email}
                         </p>
-                        <p><span className="highlight">Student ID -</span>
-                          {users && users.find(user => user._id === selectedUser)?.studentID}
-                        </p>
+                     
                       </div>
                     </div>
                   </div>
@@ -250,13 +250,13 @@ useEffect(() => {
                   <ul>
                     {userTransactions.map(transaction => (
                       <li key={transaction._id}>
-                        <strong>Book:</strong> {transaction.bookTitle} | <strong>Date:</strong> {new Date(transaction.borrowedAt).toLocaleDateString()} | <strong>Fine Amount:</strong> {transaction.fineAmount}
+                        {transaction.bookCopy.book.title} | <strong>Due Date:</strong> {new Date(transaction.dueDate).toLocaleDateString()} | <strong>Fine Amount:</strong> {transaction.fineAmount}
                         {!transaction.isReturned ? <span style={{ color: 'red' }}> (Not Returned)</span> : <span style={{ color: 'green' }}> (Returned)</span> }
-                        {transaction.fineAmount > 0 && (
+                        {/* {transaction.fineAmount > 0 && (
                           <Button type="danger" onClick={() => handleMpesaPayment(transaction.fineAmount)}>
                             Pay with Mpesa
                           </Button>
-                        )}
+                        )} */}
                       </li>
                     ))}
                   </ul>
@@ -310,10 +310,7 @@ useEffect(() => {
         {users &&  users.find(user => user._id === selectedUser)?.email}
 
         </p>
-        <p><span class="highlight">Student ID -</span>
-        {users &&  users.find(user => user._id === selectedUser)?.studentID}
-
-        </p>
+     
  
       </div>
     </div>

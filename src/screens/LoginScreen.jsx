@@ -67,7 +67,17 @@ const LoginScreen = ({ location, history }) => {
     <>
       <Container style={{ display: 'flex', justifyContent: 'center', alignItems: 'center',height:"100vh" }}>
       <Spin spinning={isLoading}>
-        <div style={{ boxShadow: 'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px', padding: '20px', width: '800px',background:"#294A70",borderRadius:"20px" }} className='card'>
+        <div 
+          style={{
+            boxShadow: 'rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px',
+            padding: '20px',
+            width: '100%',
+            maxWidth: '800px',
+            background: "#294A70",
+            borderRadius: "20px",
+          }}
+ className='card'
+        >
           <Row>
             <Col md={12} className='text-center'>
               <h1 style={{color:"white"}}>Library Management System</h1>
@@ -133,8 +143,13 @@ const LoginScreen = ({ location, history }) => {
 
             </Col>
 
-            <Col md={6} style={{display: "flex",justifyContent: "center"}}>
-              <img style={{position: "relative", right: "4%",borderRadius:"40px"}} src={home} alt="" className='w-100' />
+            <Col md={6} className="d-none d-md-flex" style={{ justifyContent: "center" }}>
+              <img
+                style={{ position: "relative", right: "4%", borderRadius: "40px" }}
+                src={home}
+                alt=""
+                className='w-100'
+              />
             </Col>
           
           </Row>
